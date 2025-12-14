@@ -1,0 +1,1401 @@
+{
+  "name": "Supply Chain Monitor - Daily Report",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -400,
+        112
+      ],
+      "id": "f34131fb-0d69-4ee6-9c5b-aef0080dfa75",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e6e4a275-ebad-4b5c-b9ad-a109500a3794",
+              "leftValue": "={{ $json.duplicate }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        1040,
+        0
+      ],
+      "id": "313f9283-d2c1-4b1c-8b2c-296bddc5e65e",
+      "name": "Remove NewsData.io Duplicates"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "app5Zqgaj1Cn89Lhq",
+          "mode": "list",
+          "cachedResultName": "N8N",
+          "cachedResultUrl": "https://airtable.com/app5Zqgaj1Cn89Lhq"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblnwUU1uYwBCqobQ",
+          "mode": "list",
+          "cachedResultName": "Articles",
+          "cachedResultUrl": "https://airtable.com/app5Zqgaj1Cn89Lhq/tblnwUU1uYwBCqobQ"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1232,
+        128
+      ],
+      "id": "c13cf02a-9fa9-4b9c-95d6-da6b96838770",
+      "name": "Get Existing Articles",
+      "executeOnce": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "YOUR_CREDENTIAL_ID",
+          "name": "airtableTokenApi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1440,
+        -32
+      ],
+      "id": "a951d733-3532-4ced-b4d4-d18f4e36715a",
+      "name": "Combine New and Existing",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get new articles from Filter node\nconst newArticles = $('Remove NewsData.io Duplicates').all();\n\n// Get existing articles from Airtable (might be empty)\nconst existingArticles = $('Get Existing Articles').all();\n\n// Extract existing URLs into a Set for fast lookup\nconst existingUrls = new Set(\n  existingArticles.map(item => item.json.article_url || item.json.fields?.article_url)\n);\n\n// Filter: keep only NEW articles not already in Airtable\nconst uniqueArticles = newArticles.filter(item => {\n  const articleUrl = item.json.link;\n  return !existingUrls.has(articleUrl);\n});\n\n// Return unique articles\nreturn uniqueArticles;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1648,
+        -32
+      ],
+      "id": "0a545ae4-3bd4-4cc6-ab46-fa2cffc57137",
+      "name": "Filter URL Duplicates"
+    },
+    {
+      "parameters": {
+        "jsCode": "const newArticles = $input.all();\nconst existingArticles = $('Get Existing Articles').all();\n\n// If no existing articles, skip deduplication\nif (existingArticles.length === 0) {\n  return [{\n    json: {\n      prompt: null,\n      skipDedup: true,\n      newArticles: newArticles.map(a => a.json)\n    }\n  }];\n}\n\n// Build deduplication prompt\nlet prompt = `Compare these NEW articles against EXISTING articles. Identify which NEW articles are semantic duplicates.\n\nNEW ARTICLES:\n`;\n\nnewArticles.forEach((art, i) => {\n  const snippet = (art.json.description || '').substring(0, 100);\n  prompt += `${i + 1}. \"${art.json.title}\" - ${snippet}...\\n`;\n});\n\nprompt += `\\nEXISTING ARTICLES (last 3 days):\n`;\n\nexistingArticles.forEach((art, i) => {\n  const snippet = (art.json.summary || art.json.fields?.summary || '').substring(0, 100);\n  const title = art.json.title || art.json.fields?.title || '';\n  const letter = String.fromCharCode(65 + i); // A, B, C...\n  prompt += `${letter}. \"${title}\" - ${snippet}...\\n`;\n});\n\nprompt += `\\nReturn ONLY duplicate pairs in format \"1 = A\" or return \"NONE\":\\n`;\n\nreturn [{\n  json: {\n    prompt,\n    skipDedup: false,\n    newArticles: newArticles.map(a => a.json)\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1856,
+        -32
+      ],
+      "id": "2077623a-d95f-446d-b80f-b4394501cdbc",
+      "name": "Build Dedup Prompt"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "71cb91e3-f35f-429d-ae17-8b3959c2348b",
+              "leftValue": "skipDedup",
+              "rightValue": "false",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2064,
+        -32
+      ],
+      "id": "403d264d-0282-4d2b-a750-e78912c9fb2a",
+      "name": "Need Deduplication?"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nreturn data.newArticles.map(art => ({ json: art }));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2272,
+        64
+      ],
+      "id": "79412f4a-4928-4ac7-a099-a585b823ae4e",
+      "name": "Pass Through All Articles"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_OPENROUTER_API_KEY"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"tngtech/deepseek-r1t2-chimera:free\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"={{ $json.prompt }}\"\n    }\n  ],\n  \"temperature\": 0.3,\n  \"stream\": false\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2272,
+        -128
+      ],
+      "id": "8242c3dd-f165-48b8-aa38-8fa901abf823",
+      "name": "OpenRouter Deduplication"
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $input.first().json;\nconst content = response.choices[0].message.content.trim();\nconst buildData = $('Build Dedup Prompt').first().json;\nconst newArticles = buildData.newArticles;\n\nconst duplicateIndices = new Set();\n\nif (content.toUpperCase() !== \"NONE\") {\n  const lines = content.split('\\n');\n  lines.forEach(line => {\n    const match = line.match(/^(\\d+)\\s*=/);\n    if (match) {\n      const index = parseInt(match[1]) - 1;\n      duplicateIndices.add(index);\n    }\n  });\n}\n\n// Filter out duplicates\nconst uniqueArticles = newArticles.filter((art, i) => \n  !duplicateIndices.has(i)\n);\n\nreturn uniqueArticles.map(art => ({ json: art }));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2480,
+        -128
+      ],
+      "id": "ae841384-51d5-4cd5-94b6-5b768c4eb85e",
+      "name": "Parse Dedup Results"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2688,
+        -128
+      ],
+      "id": "04f72dba-696b-42a8-85c2-a7ddaf3ed753",
+      "name": "Merge",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const articles = $input.all();\nconst batchSize = 20; // Process 20 articles per call\nconst batches = [];\n\nfor (let i = 0; i < articles.length; i += batchSize) {\n  const batch = articles.slice(i, i + batchSize);\n  \n  // Build a numbered list for the prompt\n  const articleList = batch.map((item, idx) => {\n    const title = item.json.title || '';\n    const desc = (item.json.description || '').substring(0, 150).replace(/\\n/g, ' ');\n    return `ID ${idx}: TITLE: ${title} | SUMMARY: ${desc}`;\n  }).join('\\n\\n');\n\n  batches.push({\n    json: {\n      prompt: `Classify the following maritime supply chain news items as RED, YELLOW, or GREEN.\n      \nRULES:\n- RED: Critical disruptions (port closures, blocked routes, strikes, attacks).\n- YELLOW: Warnings (delays, congestion, developing threats).\n- GREEN: Positive news (resolved issues, improvements, new routes) or neutral/irrelevant.\n\nINPUT ARTICLES:\n${articleList}\n\nOUTPUT FORMAT:\nReturn a JSON object where keys are the IDs (0, 1, 2...) and values are the classification.\nExample: {\"0\": \"RED\", \"1\": \"GREEN\", ...}\nDo not output markdown, just the raw JSON.`,\n      originalArticles: batch.map(b => b.json) // Pass original data along\n    }\n  });\n}\n\nreturn batches;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2848,
+        0
+      ],
+      "id": "7f83c9cd-6d81-4e54-a640-c2d2ea674ffb",
+      "name": "Build Classification Prompt"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.prompt }}",
+        "batching": {
+          "batchSize": 5,
+          "delayBetweenBatches": 0
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        2976,
+        128
+      ],
+      "id": "206d5005-4c88-4584-af87-a12bc7df29a7",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": "tngtech/deepseek-r1t2-chimera:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        2896,
+        320
+      ],
+      "id": "6bda88e1-c117-43a2-bacb-2d06bde9c344",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "YOUR_CREDENTIAL_ID",
+          "name": "openRouterApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get AI results (from the input of this node)\nconst aiResults = $input.all();\n\n// Get the original batches (from the Build Prompt node)\n// IMPORTANT: Replace 'Build Classification Prompt' with the EXACT name of your batching node\nconst originalBatches = $('Build Classification Prompt').all();\n\nconst finalArticles = [];\n\n// Loop through each AI result\naiResults.forEach((result, batchIndex) => {\n  \n  // Get the corresponding original batch data\n  // We use the index to match AI result #1 with Batch #1\n  const originalBatch = originalBatches[batchIndex];\n  \n  if (!originalBatch || !originalBatch.json.originalArticles) {\n    console.log(`Skipping batch ${batchIndex}: No original articles found.`);\n    return;\n  }\n\n  const originalArticles = originalBatch.json.originalArticles;\n  const responseText = result.json.text || result.json.content || ''; // Handle different output formats\n\n  let classifications = {};\n  \n  // Attempt to parse the JSON response\n  try {\n    const jsonMatch = responseText.match(/\\{[\\s\\S]*\\}/);\n    if (jsonMatch) {\n      classifications = JSON.parse(jsonMatch[0]);\n    } else {\n      console.log(`Batch ${batchIndex}: No JSON found in response.`);\n    }\n  } catch (e) {\n    console.error(`Batch ${batchIndex}: JSON parse error`, e);\n  }\n\n  // Attach classification to each article\n  originalArticles.forEach((article, idx) => {\n    // Get status by ID (0, 1, 2...)\n    // Fallback to 'GREEN' if missing/failed\n    const status = classifications[idx] || 'GREEN'; \n    \n    // Create new clean article object\n    finalArticles.push({\n      json: {\n        ...article,\n        classification: status.toUpperCase().trim()\n      }\n    });\n  });\n});\n\nreturn finalArticles;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3328,
+        128
+      ],
+      "id": "8aa967aa-5f11-4763-a6ca-bfee4785e3b4",
+      "name": "Attach Classifications"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "app5Zqgaj1Cn89Lhq",
+          "mode": "list",
+          "cachedResultName": "N8N",
+          "cachedResultUrl": "https://airtable.com/app5Zqgaj1Cn89Lhq"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblnwUU1uYwBCqobQ",
+          "mode": "list",
+          "cachedResultName": "Articles",
+          "cachedResultUrl": "https://airtable.com/app5Zqgaj1Cn89Lhq/tblnwUU1uYwBCqobQ"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "sent_in_email": false,
+            "classification": "={{ $json.classification.trim() }}",
+            "article_url": "={{ $json.link }}",
+            "title": "={{ $json.title }}",
+            "summary": "={{ $json.description }}",
+            "source": "={{ $json.source_name }}",
+            "published_date": "={{ $json.pubDate }}",
+            "first_seen_date": "={{ $now.toFormat('yyyy-MM-dd HH:mm:ss') }}\n"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "article_url",
+              "displayName": "article_url",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "summary",
+              "displayName": "summary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "published_date",
+              "displayName": "published_date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "first_seen_date",
+              "displayName": "first_seen_date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "classification",
+              "displayName": "classification",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "RED",
+                  "value": "RED"
+                },
+                {
+                  "name": "YELLOW",
+                  "value": "YELLOW"
+                },
+                {
+                  "name": "GREEN",
+                  "value": "GREEN"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "sent_in_email",
+              "displayName": "sent_in_email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "region",
+              "displayName": "region",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        3536,
+        128
+      ],
+      "id": "7bbdacd4-8c14-4318-bad1-b6ee30c226db",
+      "name": "Store Classified Articles",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "YOUR_CREDENTIAL_ID",
+          "name": "airtableTokenApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "app5Zqgaj1Cn89Lhq",
+          "mode": "list",
+          "cachedResultName": "N8N",
+          "cachedResultUrl": "https://airtable.com/app5Zqgaj1Cn89Lhq"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl9kV2XfJVaeEK0L",
+          "mode": "list",
+          "cachedResultName": "Users",
+          "cachedResultUrl": "https://airtable.com/app5Zqgaj1Cn89Lhq/tbl9kV2XfJVaeEK0L"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        3744,
+        128
+      ],
+      "id": "140f4648-74df-4e91-aeee-7f6cee5b788c",
+      "name": "Get Active Users",
+      "executeOnce": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "YOUR_CREDENTIAL_ID",
+          "name": "airtableTokenApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get unsent articles from Airtable\nconst articles = $('Get Unsent Articles').all();\n\n// Group by classification - handle Airtable structure\nconst redArticles = articles.filter(item => {\n  const classification = item.json.fields?.classification || item.json.classification;\n  return classification === 'RED';\n});\n\nconst yellowArticles = articles.filter(item => {\n  const classification = item.json.fields?.classification || item.json.classification;\n  return classification === 'YELLOW';\n});\n\nconst greenArticles = articles.filter(item => {\n  const classification = item.json.fields?.classification || item.json.classification;\n  return classification === 'GREEN';\n});\n\n// Helper function to generate one article item\nfunction generateArticleItem(item, colorCode, labelText) {\n  const fields = item.json.fields || item.json;\n  const title = fields.title || '';\n  const url = fields.article_url || '#';\n  const source = fields.source || '';\n  const date = fields.published_date || '';\n  const summary = (fields.summary || '').substring(0, 140) + '...';\n\n  return `\n          <tr>\n            <td style=\"padding:0 16px 8px 16px;\">\n              <table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\">\n                <tr>\n                  <td width=\"3\" bgcolor=\"${colorCode}\"></td>\n                  <td style=\"padding:8px 10px;border:1px solid #eeeeee;border-left:none;\">\n                    \n                    <table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\">\n                      <tr>\n                        <td style=\"font-family:Arial,sans-serif;font-size:11px;color:${colorCode};font-weight:bold;text-transform:uppercase;\">${labelText}</td>\n                        <td align=\"right\" style=\"font-family:Arial,sans-serif;font-size:11px;color:#888888;\">${source}${source && date ? ' \u2022 ' : ''}${date}</td>\n                      </tr>\n                    </table>\n\n                    <p style=\"margin:4px 0;font-family:Arial,sans-serif;font-size:13px;font-weight:bold;color:#111111;\">\n                      <a href=\"${url}\" style=\"color:#111111;text-decoration:none;\">${title}</a>\n                    </p>\n\n                    <p style=\"margin:0;font-family:Arial,sans-serif;font-size:12px;line-height:16px;color:#555555;\">\n                      ${summary}\n                      <a href=\"${url}\" style=\"color:#1565C0;text-decoration:none;font-size:11px;\">&nbsp;\u203a</a>\n                    </p>\n\n                  </td>\n                </tr>\n              </table>\n            </td>\n          </tr>\n  `;\n}\n\n// Build HTML email\nlet html = `\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Maritime Supply Chain Monitor</title>\n  <meta name=\"viewport\" content=\"width=device-width,initial-scale=1.0\">\n  <style>\n    body {margin:0;padding:0;background:#ffffff;}\n    table {border-collapse:collapse;border-spacing:0;}\n    @media only screen and (max-width:600px){\n      .container{width:100%!important;}\n    }\n  </style>\n</head>\n<body style=\"margin:0;padding:0;background:#ffffff;\">\n  \n  <table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\">\n    <tr>\n      <td align=\"center\" style=\"padding:20px 0;\">\n        \n        <table role=\"presentation\" class=\"container\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\" style=\"width:100%;max-width:640px;background:#ffffff;\">\n          \n          <tr>\n            <td style=\"padding:16px;\">\n              <h1 style=\"margin:0;font-family:Arial,sans-serif;font-size:18px;font-weight:bold;color:#111111;\">Maritime Supply Chain Monitor</h1>\n              <p style=\"margin:4px 0 0 0;font-family:Arial,sans-serif;font-size:11px;color:#888888;\">Daily digest \u2022 ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</p>\n              <p style=\"margin:4px 0 0 0;font-family:Arial,sans-serif;font-size:11px;color:#555555;\">RED: ${redArticles.length} \u2022 YELLOW: ${yellowArticles.length} \u2022 GREEN: ${greenArticles.length}</p>\n            </td>\n          </tr>\n`;\n\n// RED SECTION\nif (redArticles.length > 0) {\n  html += `\n          <tr>\n            <td style=\"padding:4px 16px;\">\n              <p style=\"margin:0;font-family:Arial,sans-serif;font-size:12px;font-weight:bold;color:#D32F2F;\">\ud83d\udd34 Critical disruptions</p>\n            </td>\n          </tr>\n  `;\n  \n  redArticles.forEach(item => {\n    html += generateArticleItem(item, '#D32F2F', 'RED');\n  });\n}\n\n// YELLOW SECTION\nif (yellowArticles.length > 0) {\n  html += `\n          <tr>\n            <td style=\"padding:4px 16px;\">\n              <p style=\"margin:0;font-family:Arial,sans-serif;font-size:12px;font-weight:bold;color:#F57C00;\">\ud83d\udfe1 Monitor</p>\n            </td>\n          </tr>\n  `;\n  \n  yellowArticles.forEach(item => {\n    html += generateArticleItem(item, '#F57C00', 'YELLOW');\n  });\n}\n\n// GREEN SECTION\nif (greenArticles.length > 0) {\n  html += `\n          <tr>\n            <td style=\"padding:4px 16px;\">\n              <p style=\"margin:0;font-family:Arial,sans-serif;font-size:12px;font-weight:bold;color:#2E7D32;\">\ud83d\udfe2 Resolved</p>\n            </td>\n          </tr>\n  `;\n  \n  greenArticles.forEach(item => {\n    html += generateArticleItem(item, '#2E7D32', 'GREEN');\n  });\n}\n\n// NO ARTICLES (all clear)\nif (redArticles.length === 0 && yellowArticles.length === 0 && greenArticles.length === 0) {\n  html += `\n          <tr>\n            <td style=\"padding:20px 16px;\">\n              <p style=\"margin:0;font-family:Arial,sans-serif;font-size:14px;color:#2E7D32;text-align:center;\">\u2705 No significant supply chain disruptions today!</p>\n            </td>\n          </tr>\n  `;\n}\n\n// FOOTER\nhtml += `\n          <tr>\n            <td style=\"padding:16px;border-top:1px solid #eeeeee;\">\n              <table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\">\n                <tr>\n                  <td style=\"font-family:Arial,sans-serif;font-size:11px;color:#999999;\">Automated report from Supply Chain Monitor</td>\n                  <td align=\"right\" style=\"font-family:Arial,sans-serif;font-size:11px;\">\n                    <a href=\"#\" style=\"color:#999999;text-decoration:underline;\">Manage alerts</a>\n                  </td>\n                </tr>\n              </table>\n            </td>\n          </tr>\n\n        </table>\n\n      </td>\n    </tr>\n  </table>\n\n</body>\n</html>\n`;\n\nreturn [{\n  json: {\n    emailHtml: html,\n    articleCount: articles.length,\n    redCount: redArticles.length,\n    yellowCount: yellowArticles.length,\n    greenCount: greenArticles.length\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4160,
+        128
+      ],
+      "id": "a656c51f-e217-4def-b033-2d96c40925ac",
+      "name": "Build Email HTML"
+    },
+    {
+      "parameters": {
+        "fromEmail": "your-email@example.com",
+        "toEmail": "={{ $json.userEmail }}",
+        "subject": "={{ $json.subject }}",
+        "html": "={{ $json.emailHtml }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        4576,
+        128
+      ],
+      "id": "8cae6fa3-4768-4589-ba29-ac2684a8f304",
+      "name": "Send email",
+      "webhookId": "7b7def9e-f7ee-4824-9a2a-9d55fa3970f1",
+      "credentials": {
+        "smtp": {
+          "id": "YOUR_CREDENTIAL_ID",
+          "name": "smtp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "app5Zqgaj1Cn89Lhq",
+          "mode": "list",
+          "cachedResultName": "N8N",
+          "cachedResultUrl": "https://airtable.com/app5Zqgaj1Cn89Lhq"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblnwUU1uYwBCqobQ",
+          "mode": "list",
+          "cachedResultName": "Articles",
+          "cachedResultUrl": "https://airtable.com/app5Zqgaj1Cn89Lhq/tblnwUU1uYwBCqobQ"
+        },
+        "filterByFormula": "{sent_in_email} = FALSE()",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        3952,
+        128
+      ],
+      "id": "4cbc1db3-a181-4191-a56b-8ab0d90246be",
+      "name": "Get Unsent Articles",
+      "executeOnce": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "YOUR_CREDENTIAL_ID",
+          "name": "airtableTokenApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the email HTML (1 item from Build Email HTML)\nconst emailData = $('Build Email HTML').first().json;\n\n// Get all active users\nconst users = $('Get Active Users').all();\n\n// Create one item per user with both email HTML and user email\nreturn users.map(user => ({\n  json: {\n    userEmail: user.json.email,\n    emailHtml: emailData.emailHtml,\n    subject:`\u2693 Maritime Supply Chain Monitor - ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`\n  }\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4368,
+        128
+      ],
+      "id": "ad7293ad-5d2b-43b7-84e7-5b33d048f39b",
+      "name": "Prepare Email for Each User",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get all the articles that were sent\nconst articles = $('Get Unsent Articles').all();\n\n// Return each article ID with the update flag\nreturn articles.map(article => ({\n  json: {\n    id: article.json.id,\n    sent_in_email: true\n  }\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4784,
+        128
+      ],
+      "id": "7fea46be-d651-4d39-8854-465dbf8fa60d",
+      "name": "Prepare Update Data",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "app5Zqgaj1Cn89Lhq",
+          "mode": "list",
+          "cachedResultName": "N8N",
+          "cachedResultUrl": "https://airtable.com/app5Zqgaj1Cn89Lhq"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblnwUU1uYwBCqobQ",
+          "mode": "list",
+          "cachedResultName": "Articles",
+          "cachedResultUrl": "https://airtable.com/app5Zqgaj1Cn89Lhq/tblnwUU1uYwBCqobQ"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "sent_in_email": "={{ $json.sent_in_email }}",
+            "id": "={{ $json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "article_url",
+              "displayName": "article_url",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "summary",
+              "displayName": "summary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "published_date",
+              "displayName": "published_date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "first_seen_date",
+              "displayName": "first_seen_date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "classification",
+              "displayName": "classification",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "RED",
+                  "value": "RED"
+                },
+                {
+                  "name": "YELLOW",
+                  "value": "YELLOW"
+                },
+                {
+                  "name": "GREEN",
+                  "value": "GREEN"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "sent_in_email",
+              "displayName": "sent_in_email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "region",
+              "displayName": "region",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        4992,
+        128
+      ],
+      "id": "59f09244-1a95-4d04-ae4b-fd1fa8eea4b3",
+      "name": "Mark Articles as Sent",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "YOUR_CREDENTIAL_ID",
+          "name": "airtableTokenApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Code Node: Normalize All Sources to Standard Article Format\n\nconst items = $input.all();\nconst normalized = [];\n\nitems.forEach(item => {\n  const data = item.json;\n  \n  // Skip empty items\n  if (!data || data.skip) return;\n  \n  // CASE 1: NewsData.io format (has 'results' array)\n  if (data.results && Array.isArray(data.results)) {\n    data.results.forEach(article => {\n      normalized.push({\n        json: {\n          title: article.title || 'Untitled',\n          description: cleanText(article.description || ''),\n          link: article.link || article.url || '',\n          source_name: article.source_id || article.source_name || 'NewsData.io',\n          pubDate: article.pubDate || new Date().toISOString(),\n          country: article.country?.[0] || null,\n          category: article.category || [],\n          duplicate: false\n        }\n      });\n    });\n    return;\n  }\n  \n  // CASE 2: GAC Hot Port News format (has source_id = \"GAC Hot Port News\")\n  if (data.source_id === 'GAC Hot Port News' || data.source_id === 'GAC') {\n    normalized.push({\n      json: {\n        title: data.title || 'Untitled',\n        description: cleanText(data.description || data.content || ''),\n        link: data.link || data.article_url || '',\n        source_name: 'GAC Hot Port News',\n        pubDate: data.pubDate || new Date().toISOString(),\n        country: data.country || null,\n        category: data.category || ['logistics', 'maritime', 'port'],\n        duplicate: false\n      }\n    });\n    return;\n  }\n  \n  // CASE 3: Already normalized format (has all required fields)\n  if (data.title && data.link && data.source_name) {\n    normalized.push({\n      json: {\n        title: data.title,\n        description: cleanText(data.description || ''),\n        link: data.link,\n        source_name: data.source_name,\n        pubDate: data.pubDate || new Date().toISOString(),\n        country: data.country || null,\n        category: data.category || [],\n        duplicate: false\n      }\n    });\n    return;\n  }\n  \n  // CASE 4: RSS feed format (from RSS Feed Read nodes)\n  normalized.push({\n    json: {\n      title: data.title || data.heading || 'Untitled',\n      description: cleanText(data.contentSnippet || data.description || data.summary || data.content || ''),\n      link: data.link || data.url || '',\n      source_name: determineSource(data),\n      pubDate: data.isoDate || data.pubDate || data.date || new Date().toISOString(),\n      country: null,\n      category: [],\n      duplicate: false,\n      // Preserve author if available\n      ...(data.creator || data['dc:creator'] ? { author: data.creator || data['dc:creator'] } : {})\n    }\n  });\n});\n\nconsole.log(`Normalized ${normalized.length} items from ${items.length} input items`);\n\nreturn normalized;\n\n// ========== HELPER FUNCTIONS ==========\n\n// Clean HTML entities and extra whitespace\nfunction cleanText(text) {\n  if (!text) return '';\n  \n  return text\n    .replace(/<[^>]*>/g, '')           // Remove HTML tags\n    .replace(/&nbsp;/g, ' ')\n    .replace(/&amp;/g, '&')\n    .replace(/&lt;/g, '<')\n    .replace(/&gt;/g, '>')\n    .replace(/&quot;/g, '\"')\n    .replace(/&#39;/g, \"'\")\n    .replace(/&apos;/g, \"'\")\n    .replace(/'/g, \"'\")\n    .replace(/\"/g, '\"')\n    .replace(/\"/g, '\"')\n    .replace(/\\s+/g, ' ')              // Normalize whitespace\n    .trim()\n    .substring(0, 1000);                // Limit length\n}\n\n// Determine source from feed data\nfunction determineSource(data) {\n  const link = data.link || data.url || '';\n  const feedTitle = data.meta?.title || '';\n  \n  // Check feed title first\n  if (feedTitle.toLowerCase().includes('maritime executive')) return 'Maritime Executive';\n  if (feedTitle.toLowerCase().includes('gcaptain')) return 'gCaptain';\n  if (feedTitle.toLowerCase().includes('loadstar')) return 'The Loadstar';\n  if (feedTitle.toLowerCase().includes('marinelink')) return 'MarineLink';\n  \n  // Check URL patterns\n  if (link.includes('maritime-executive.com')) return 'Maritime Executive';\n  if (link.includes('gcaptain.com')) return 'gCaptain';\n  if (link.includes('theloadstar.com')) return 'The Loadstar';\n  if (link.includes('marinelink.com')) return 'MarineLink';\n  if (link.includes('newsdata.io')) return 'NewsData.io';\n  if (link.includes('gac.com/hot-port-news')) return 'GAC Hot Port News';\n  \n  // Check creator field\n  if (data.creator) return data.creator;\n  if (data['dc:creator']) return data['dc:creator'];\n  \n  // Default\n  return 'RSS Feed';\n}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        784,
+        320
+      ],
+      "id": "d9c91b2c-3b06-4c2c-8f1e-b102c4b38083",
+      "name": "Normalize All Formats"
+    },
+    {
+      "parameters": {
+        "numberInputs": 5
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        512,
+        240
+      ],
+      "id": "2fd5a727-f097-459a-a615-9346515fee05",
+      "name": "Merge All Sources",
+      "executeOnce": false,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://newsdata.io/api/1/news",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "YOUR_NEWSDATA_API_KEY"
+            },
+            {
+              "name": "qInTitle",
+              "value": "=(port OR shipping OR freight OR terminal) AND (closure OR blockage OR delay)"
+            },
+            {
+              "name": "language",
+              "value": "en"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        208,
+        -48
+      ],
+      "id": "4bed0bec-a78d-40b7-a95c-0c0eed17f820",
+      "name": "Newsdata.io API",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://maritime-executive.com/articles.rss",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        208,
+        112
+      ],
+      "id": "8ee4f8d3-f854-4292-8752-c95b7c078dae",
+      "name": "Maritime Executive RSS",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://feeds.feedburner.com/gcaptain",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -480,
+        464
+      ],
+      "id": "b1411db6-4599-43c8-a757-df148f3cf6e2",
+      "name": "gCaptain RSS",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://theloadstar.com/feed/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        192,
+        400
+      ],
+      "id": "d9d3742b-4fd1-4d68-8459-2d022ba594c1",
+      "name": "theloadstar RSS",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://www.marinelink.com/news/rss",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -336,
+        560
+      ],
+      "id": "1c4dd892-0156-4141-9727-b0e5cdf51cfb",
+      "name": "Marinelink RSS",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "http://piracy-scraper-production.up.railway.app/api/piracy",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        48,
+        704
+      ],
+      "id": "02163f6c-8730-40eb-9e38-d44fdd8f3cb2",
+      "name": "Get ICC Piracy Incidents",
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse the JSON response and transform to workflow format\nconst response = JSON.parse($input.first().json.data);\n\nif (!response.success || !response.incidents) {\n  return [];\n}\n\nreturn response.incidents.map(incident => ({\n  json: {\n    title: `Maritime Piracy: Incident ${incident.incident_number}`,\n    description: incident.narrations.substring(0, 200) + '...',\n    link: 'https://icc-ccs.org/map/',\n    pubDate: incident.date,\n    source_id: 'ICC CCS',\n    article_id: `icc-${incident.incident_number}`,\n    article_url: `https://icc-ccs.org/map/#${incident.incident_number}`,\n    image_url: null,\n    video_url: null,\n    source_url: 'https://icc-ccs.org/map/',\n    source_icon: null,\n    source_priority: 1,\n    country: null,\n    category: ['crime', 'maritime'],\n    language: 'en',\n    sentiment: null,\n    ai_tag: null,\n    ai_region: null,\n    ai_org: null,\n    duplicate: false,\n    content: incident.narrations\n  }\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        256,
+        704
+      ],
+      "id": "6e7b803c-44ca-4cea-bd55-4d54291a63bb",
+      "name": "Transform ICC Data"
+    },
+    {
+      "parameters": {
+        "url": "https://www.gac.com/hot-port-news",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        240,
+        912
+      ],
+      "id": "c111d876-5d2b-4703-b2ae-c82e1ef65fa7",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "sourceData": "binary",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "cards",
+              "cssSelector": ".col-main a.card-main",
+              "returnValue": "html",
+              "returnArray": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        448,
+        912
+      ],
+      "id": "8f0401ef-6087-474e-9376-864620a878f7",
+      "name": "HTML"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nconst cardsArray = input.cards || [];\n\nconst results = [];\n\ncardsArray.forEach((cardHtml, index) => {\n  try {\n    // Extract date\n    const dateMatch = cardHtml.match(/<p[^>]*>(\\d{1,2}\\s+\\w{3,}\\s+\\d{4})<\\/p>/);\n    if (!dateMatch) {\n      console.log(`Card ${index}: No date - skipping`);\n      return;\n    }\n    const date = dateMatch[1].trim();\n    \n    // Extract location (second <p> tag)\n    const allPTags = cardHtml.match(/<p[^>]*>([^<]+)<\\/p>/g) || [];\n    if (allPTags.length < 2) {\n      console.log(`Card ${index}: Missing location - skipping`);\n      return;\n    }\n    const location = allPTags[1]\n      .replace(/<\\/?p[^>]*>/g, '')\n      .replace(/&amp;/g, '&')\n      .trim();\n    \n    // Skip non-location items (Corporate News, Insights, Feature, GAC VOICES)\n    if (location === 'Feature' || location === 'GAC VOICES' || location.includes('Corporate') || location.includes('Insights')) {\n      console.log(`Card ${index}: Non-location (${location}) - skipping`);\n      return;\n    }\n    \n    // Extract title\n    const titleMatch = cardHtml.match(/<h6[^>]*>([^<]+)<\\/h6>/i);\n    if (!titleMatch) {\n      console.log(`Card ${index}: No title - skipping`);\n      return;\n    }\n    const title = titleMatch[1].trim();\n    \n    // Extract description (text after h6, before Read More)\n    const descMatch = cardHtml.match(/<\\/h6>\\s*([^<]+)/);\n    const description = descMatch \n      ? descMatch[1].trim().replace(/Read More/gi, '').trim()\n      : '';\n    \n    // Generate URL slug from title\n    const slug = title.toLowerCase()\n      .replace(/'/g, '')\n      .replace(/[^a-z0-9\\s-]/g, '')\n      .replace(/\\s+/g, '-')\n      .replace(/-{2,}/g, '-')\n      .substring(0, 80);\n    \n    const articleUrl = `https://www.gac.com/hot-port-news/${slug}`;\n    \n    results.push({\n      json: {\n        title: title,\n        description: description.substring(0, 300),\n        link: articleUrl,\n        pubDate: date,\n        source_id: 'GAC Hot Port News',\n        article_id: `gac-${slug}`,\n        article_url: articleUrl,\n        image_url: null,\n        video_url: null,\n        source_url: 'https://www.gac.com/hot-port-news',\n        source_priority: 1,\n        country: location,\n        category: ['logistics', 'maritime', 'port'],\n        language: 'en',\n        sentiment: null,\n        ai_tag: null,\n        ai_region: null,\n        ai_org: null,\n        duplicate: false,\n        content: description.substring(0, 500)\n      }\n    });\n    \n    console.log(`\u2713 Card ${index}: ${title} (${location})`);\n    \n  } catch (e) {\n    console.log(`\u2717 Card ${index}: Error - ${e.message}`);\n  }\n});\n\nconsole.log(`\\n\u2713 Successfully extracted ${results.length} Hot Port News items`);\n\nif (results.length === 0) {\n  throw new Error('No Hot Port News items found after filtering');\n}\n\nreturn results;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        592,
+        560
+      ],
+      "id": "30b20521-5abe-4b25-84ca-af46ba6a58a2",
+      "name": "GAC formatting code"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Maritime Executive RSS",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Newsdata.io API",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "gCaptain RSS",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "theloadstar RSS",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Marinelink RSS",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get ICC Piracy Incidents",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove NewsData.io Duplicates": {
+      "main": [
+        [
+          {
+            "node": "Combine New and Existing",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Existing Articles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Existing Articles": {
+      "main": [
+        [
+          {
+            "node": "Combine New and Existing",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Combine New and Existing": {
+      "main": [
+        [
+          {
+            "node": "Filter URL Duplicates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter URL Duplicates": {
+      "main": [
+        [
+          {
+            "node": "Build Classification Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Dedup Prompt": {
+      "main": [
+        [
+          {
+            "node": "Need Deduplication?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Need Deduplication?": {
+      "main": [
+        [
+          {
+            "node": "OpenRouter Deduplication",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Pass Through All Articles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Deduplication": {
+      "main": [
+        [
+          {
+            "node": "Parse Dedup Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pass Through All Articles": {
+      "main": [
+        []
+      ]
+    },
+    "Parse Dedup Results": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        []
+      ]
+    },
+    "Build Classification Prompt": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Attach Classifications",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Attach Classifications": {
+      "main": [
+        [
+          {
+            "node": "Store Classified Articles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Classified Articles": {
+      "main": [
+        [
+          {
+            "node": "Get Active Users",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Active Users": {
+      "main": [
+        [
+          {
+            "node": "Get Unsent Articles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Email HTML": {
+      "main": [
+        [
+          {
+            "node": "Prepare Email for Each User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Unsent Articles": {
+      "main": [
+        [
+          {
+            "node": "Build Email HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Email for Each User": {
+      "main": [
+        [
+          {
+            "node": "Send email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send email": {
+      "main": [
+        [
+          {
+            "node": "Prepare Update Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Update Data": {
+      "main": [
+        [
+          {
+            "node": "Mark Articles as Sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge All Sources": {
+      "main": [
+        [
+          {
+            "node": "Normalize All Formats",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Newsdata.io API": {
+      "main": [
+        [
+          {
+            "node": "Merge All Sources",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Maritime Executive RSS": {
+      "main": [
+        [
+          {
+            "node": "Merge All Sources",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "gCaptain RSS": {
+      "main": [
+        []
+      ]
+    },
+    "theloadstar RSS": {
+      "main": [
+        [
+          {
+            "node": "Merge All Sources",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Marinelink RSS": {
+      "main": [
+        []
+      ]
+    },
+    "Normalize All Formats": {
+      "main": [
+        [
+          {
+            "node": "Remove NewsData.io Duplicates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get ICC Piracy Incidents": {
+      "main": [
+        [
+          {
+            "node": "Transform ICC Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform ICC Data": {
+      "main": [
+        [
+          {
+            "node": "Merge All Sources",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML": {
+      "main": [
+        [
+          {
+            "node": "GAC formatting code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GAC formatting code": {
+      "main": [
+        [
+          {
+            "node": "Merge All Sources",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6709c907-0b56-4ad9-963a-ba9bb8e65b48",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4f5ae14f60cab589d4d537320aefbc176f5340bb1063408aca1612ccc393433d"
+  },
+  "id": "eJW1KC5k2xsvNVBJ",
+  "tags": []
+}
