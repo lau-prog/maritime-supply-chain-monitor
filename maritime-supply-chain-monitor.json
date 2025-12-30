@@ -115,7 +115,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const articles = $input.all();\nconst batchSize = 20; // Process 20 articles per call\nconst batches = [];\n\nfor (let i = 0; i < articles.length; i += batchSize) {\n  const batch = articles.slice(i, i + batchSize);\n  \n  // Build a numbered list for the prompt\n  const articleList = batch.map((item, idx) => {\n    const title = item.json.title || '';\n    const desc = (item.json.description || '').substring(0, 200).replace(/\\n/g, ' ');\n    return `ID ${idx}: TITLE: ${title} | SUMMARY: ${desc}`;\n  }).join('\\n\\n');\n\n  batches.push({\n    json: {\n      prompt: `Classify the following maritime supply chain news items.\n\nONLY classify if it affects COMMERCIAL CARGO/FREIGHT operations.\n\nEXCLUDE entirely (mark as SKIP):\n- Military operations (submarines, navy, warfare, military vessels)\n- Drug smuggling/enforcement operations\n- Fishing vessels/fishermen disputes\n- Passenger ferries (unless cargo impact mentioned)\n- Coast guard rescues (unless cargo vessels)\n- Industry appointments/awards/personnel changes\n- Product launches/technology announcements\n- Conference announcements/invitations\n- Editorial/opinion pieces\n- Ship recycling/scrapping news\n\nCLASSIFICATION RULES:\n\nRED (Critical - immediate commercial cargo disruption):\n- Commercial port/terminal closures or shutdowns\n- Cargo vessel accidents blocking shipping lanes/canals\n- Strikes affecting freight operations BEGINNING\n- Severe weather CLOSING ports to cargo operations\n- Major congestion causing multi-day cargo delays\n- Sanctions DIRECTLY affecting commercial trade flows\n\nYELLOW (Developing - monitor commercial situation):\n- Cargo delays at ports/terminals\n- Strike THREATS affecting freight\n- Moderate congestion at ports\n- Weather WARNINGS for cargo ports\n- Customs/border delays affecting freight\n- Tariff changes affecting shipping\n- Container shortages\n- NEW ROUTES or NETWORK CHANGES by carriers\n\nGREEN (Previously RED/YELLOW issue now RESOLVED):\n- Ports REOPENED after closure\n- Strikes ENDED\n- Congestion CLEARED\n- Vessels refloated/channels reopened\n- Weather warnings lifted/operations resumed\n\nSKIP (Not relevant to commercial cargo supply chains):\n- All military/naval operations\n- All fishing vessel news\n- Passenger-only ferry news\n- Personnel announcements\n- Industry conferences/events\n- Technology/product launches (unless resolving a disruption)\n\nINPUT ARTICLES:\n${articleList}\n\nOUTPUT FORMAT:\nReturn a JSON object where keys are the IDs (0, 1, 2...) and values are the classification.\nUse: RED, YELLOW, GREEN, or SKIP\nExample: {\"0\": \"RED\", \"1\": \"SKIP\", \"2\": \"YELLOW\", ...}\nDo not output markdown, just the raw JSON.`,\n      originalArticles: batch.map(b => b.json) // Pass original data along\n    }\n  });\n}\n\nreturn batches;\n"
+        "jsCode": "const articles = $input.all();\nconst batchSize = 20; // Process 20 articles per call\nconst batches = [];\n\nfor (let i = 0; i < articles.length; i += batchSize) {\n  const batch = articles.slice(i, i + batchSize);\n  \n  // Build a numbered list for the prompt\n  const articleList = batch.map((item, idx) => {\n    const title = item.json.title || '';\n    const desc = (item.json.description || '').substring(0, 200).replace(/\\n/g, ' ');\n    return `ID ${idx}: TITLE: ${title} | SUMMARY: ${desc}`;\n  }).join('\\n\\n');\n\n  batches.push({\n    json: {\n      prompt: `Classify the following maritime supply chain news items.\n\nONLY classify if it affects COMMERCIAL CARGO/FREIGHT operations.\n**🚨 PIRACY/SECURITY INCIDENTS - NEVER SKIP:**\nAny article about piracy, armed robbery, vessel attacks, or maritime security MUST be classified.\n- Piracy attacks, hijacking, kidnapping → RED\n- Armed robbery with violence or weapons → RED  \n- Crew injuries or deaths → RED\n- Vessel damage affecting operations → RED\n- Attempted boarding with weapons → YELLOW\n- Suspicious approaches or unauthorized boarding → YELLOW\n- Theft without violence → YELLOW\n- Security warnings in piracy-prone areas → YELLOW\n\nEXCLUDE entirely (mark as SKIP):\n- Military operations (submarines, navy, warfare, military vessels)\n- Drug smuggling/enforcement operations\n- Fishing vessels/fishermen disputes UNLESS piracy/armed robbery involved\n- Passenger ferries (unless cargo impact mentioned)\n- Coast guard rescues (unless cargo vessels  or piracy-related)\n- Industry appointments/awards/personnel changes\n- Product launches/technology announcements\n- Conference announcements/invitations\n- Editorial/opinion pieces\n- Ship recycling/scrapping news\n\nCLASSIFICATION RULES:\n\nRED (Critical - immediate commercial cargo disruption):\n- Piracy with violence, crew injuries, kidnapping, or hijacking\n- **Armed attacks on commercial vessels with weapons used**\n- Commercial port/terminal closures or shutdowns\n- Cargo vessel accidents blocking shipping lanes/canals\n- Strikes affecting freight operations BEGINNING\n- Severe weather CLOSING ports to cargo operations\n- Major congestion causing multi-day cargo delays\n- Sanctions DIRECTLY affecting commercial trade flows\n\nYELLOW (Developing - monitor commercial situation):\n- Cargo delays at ports/terminals\n- Strike THREATS affecting freight\n- **Attempted piracy or armed robbery (unsuccessful)**\n- **Boarding of vessels with theft but no violence**\n- **Security alerts in high-risk piracy areas**\n- **Suspicious vessel approaches or unauthorized boardings**\n- Moderate congestion at ports\n- Weather WARNINGS for cargo ports\n- Customs/border delays affecting freight\n- Tariff changes affecting shipping\n- Container shortages\n- NEW ROUTES or NETWORK CHANGES by carriers\n\nGREEN (Previously RED/YELLOW issue now RESOLVED):\n- Ports REOPENED after closure\n- Strikes ENDED\n- Congestion CLEARED\n- Vessels refloated/channels reopened\n- Weather warnings lifted/operations resumed\n-**Piracy suspects captured/areas secured**\n\nSKIP (Not relevant to commercial cargo supply chains):\n- All military/naval operations (unless piracy related)\n- All fishing vessel news\n- Passenger-only ferry news \n- Personnel announcements\n- Industry conferences/events\n- Technology/product launches (unless resolving a disruption)\n\nINPUT ARTICLES:\n${articleList}\n\nOUTPUT FORMAT:\nReturn a JSON object where keys are the IDs (0, 1, 2...) and values are the classification.\nUse: RED, YELLOW, GREEN, or SKIP\nExample: {\"0\": \"RED\", \"1\": \"SKIP\", \"2\": \"YELLOW\", ...}\nDo not output markdown, just the raw JSON.`,\n      originalArticles: batch.map(b => b.json) // Pass original data along\n    }\n  });\n}\n\nreturn batches;\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -782,7 +782,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Parse the JSON response and transform to workflow format\nconst response = JSON.parse($input.first().json.data);\n\nif (!response.success || !response.incidents) {\n  return [];\n}\n\nreturn response.incidents.map(incident => ({\n  json: {\n    title: `Maritime Piracy: Incident ${incident.incident_number}`,\n    description: incident.narrations.substring(0, 200) + '...',\n    link: 'https://icc-ccs.org/map/',\n    pubDate: incident.date,\n    source_id: 'ICC CCS',\n    article_id: `icc-${incident.incident_number}`,\n    article_url: `https://icc-ccs.org/map/#${incident.incident_number}`,\n    image_url: null,\n    video_url: null,\n    source_url: 'https://icc-ccs.org/map/',\n    source_icon: null,\n    source_priority: 1,\n    country: null,\n    category: ['crime', 'maritime'],\n    language: 'en',\n    sentiment: null,\n    ai_tag: null,\n    ai_region: null,\n    ai_org: null,\n    duplicate: false,\n    content: incident.narrations\n  }\n}));\n"
+        "jsCode": "// Parse the JSON response and transform to workflow format\nconst response = JSON.parse($input.first().json.data);\n\nif (!response.success || !response.incidents) {\n  console.log('No ICC piracy data available');\n  return [];\n}\n\nreturn response.incidents.map((incident, index) => {\n  const narration = incident.narrations || incident.narration || '';\n  \n  // Extract key information from narration\n  const locationMatch = narration.match(/Posn:.*?,\\s*([^.\\n]+)/);\n  const location = locationMatch ? locationMatch[1].trim() : 'Unknown Location';\n  \n  // Extract vessel type (bulk carrier, tanker, etc.)\n  const vesselMatch = narration.match(/(bulk carrier|tanker|LPG tanker|container ship|general cargo|barge)/i);\n  const vesselType = vesselMatch ? vesselMatch[1] : 'vessel';\n  \n  // Extract incident type (boarded, armed robbery, theft, kidnapped, etc.)\n  let incidentType = 'Incident';\n  if (narration.toLowerCase().includes('kidnap')) incidentType = 'Kidnapping';\n  else if (narration.toLowerCase().includes('armed') && narration.toLowerCase().includes('boarded')) incidentType = 'Armed boarding';\n  else if (narration.toLowerCase().includes('boarded')) incidentType = 'Unauthorized boarding';\n  else if (narration.toLowerCase().includes('theft') || narration.toLowerCase().includes('stole')) incidentType = 'Theft';\n  else if (narration.toLowerCase().includes('approached')) incidentType = 'Suspicious approach';\n  \n  // Create concise, informative title\n  const title = `Piracy: ${incidentType} of ${vesselType} - ${location}`;\n  \n  // Get incident number (try different possible field names)\n  const incidentNum = incident.incidentnumber || \n                      incident.incident_number || \n                      incident.incidentNumber || \n                      incident.id || \n                      `${incident.date}-${index}`;\n  \n  // Extract date\n  const dateStr = incident.date || incident.pubDate || new Date().toISOString().split('T')[0];\n  \n  return {\n    json: {\n      title: title,\n      description: narration.substring(0, 500) + (narration.length > 500 ? '...' : ''),\n      link: `https://icc-ccs.org/map/${incidentNum}`,\n      pubDate: dateStr,\n      source_id: 'ICC CCS',\n      source_name: 'ICC Commercial Crime Services',\n      article_id: `icc-${incidentNum}`,\n      article_url: `https://icc-ccs.org/map/${incidentNum}`,\n      imageurl: null,\n      videourl: null,\n      sourceurl: 'https://icc-ccs.org/map',\n      sourceicon: null,\n      sourcepriority: 1,\n      country: location,\n      category: ['crime', 'maritime', 'piracy'],\n      language: 'en',\n      sentiment: null,\n      aitag: null,\n      airegion: null,\n      aiorg: null,\n      duplicate: false,\n      content: narration\n    }\n  };\n});\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -887,7 +887,7 @@
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
       "position": [
-        2368,
+        3408,
         464
       ],
       "id": "a234ae7d-e8bf-45c1-8fc3-9de793555705",
@@ -906,7 +906,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2576,
+        3616,
         464
       ],
       "id": "f4220b2c-dd60-435c-8f34-14e6e1638e45",
@@ -934,7 +934,7 @@
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
       "position": [
-        2784,
+        3824,
         464
       ],
       "id": "937b9e8c-1279-41ea-850e-1c49486d6d13",
@@ -946,6 +946,104 @@
         }
       },
       "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Collect comprehensive debug data from workflow execution\n\nconst debugData = {\n  execution: {\n    timestamp: new Date().toISOString(),\n    date: new Date().toLocaleDateString('en-US', { \n      weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' \n    })\n  },\n  \n  sources: {\n    newsdata: collectSourceStats('Newsdata.io API'),\n    maritimeExecutive: collectSourceStats('Maritime Executive RSS'),\n    loadstar: collectSourceStats('theloadstar RSS'),\n    iccPiracy: collectSourceStats('Transform ICC Data'),\n    gacHotPorts: collectSourceStats('GAC formatting code')\n  },\n  \n  deduplication: {\n    totalCollected: $('Merge All Sources').all().length,\n    newsdataInternalDupes: calculateNewsdataDupes(),\n    urlDuplicates: calculateUrlDupes(),\n    finalProcessed: $('Build Classification Prompt').all().length\n  },\n  \n  classification: {\n    red: $('Store Classified Articles').all().filter(i => \n      (i.json.classification || '').toUpperCase() === 'RED').length,\n    yellow: $('Store Classified Articles').all().filter(i => \n      (i.json.classification || '').toUpperCase() === 'YELLOW').length,\n    green: $('Store Classified Articles').all().filter(i => \n      (i.json.classification || '').toUpperCase() === 'GREEN').length,\n    skip: getSkippedArticles().length\n  },\n  \n  discarded: {\n    skippedArticles: getSkippedArticles(),\n    duplicateUrls: getDuplicateUrls()\n  },\n  \n  errors: collectErrors(),\n  \n  performance: {\n    articlesProcessed: $('Store Classified Articles').all().length,\n    llmCallsEstimate: Math.ceil($('Build Classification Prompt').all().length / 20),\n    emailsSent: $('Send email').all().length\n  }\n};\n\n// Helper functions\nfunction collectSourceStats(nodeName) {\n  try {\n    const node = $(nodeName);\n    const items = node.all();\n    \n    return {\n      status: 'success',\n      articlesFound: items.length,\n      error: null\n    };\n  } catch (e) {\n    return {\n      status: 'error',\n      articlesFound: 0,\n      error: e.message\n    };\n  }\n}\n\nfunction calculateNewsdataDupes() {\n  try {\n    const before = $('Merge All Sources').all().length;\n    const after = $('Remove NewsData.io Duplicates').all().length;\n    return before - after;\n  } catch {\n    return 0;\n  }\n}\n\nfunction calculateUrlDupes() {\n  try {\n    const before = $('Remove NewsData.io Duplicates').all().length;\n    const after = $('Filter URL Duplicates').all().length;\n    return before - after;\n  } catch {\n    return 0;\n  }\n}\n\nfunction getSkippedArticles() {\n  try {\n    const beforeFilter = $('Attach Classifications').all();\n    const afterFilter = $('Filter').all();\n    \n    return beforeFilter\n      .filter(item => (item.json.classification || '').toUpperCase() === 'SKIP')\n      .map(item => ({\n        title: item.json.title || 'Untitled',\n        source: item.json.source_name || item.json.source || 'Unknown',\n        url: item.json.link || item.json.article_url || ''\n      }));\n  } catch {\n    return [];\n  }\n}\n\nfunction getDuplicateUrls() {\n  try {\n    const filtered = $('Filter URL Duplicates').all();\n    const existing = $('Get Existing Articles').all();\n    \n    // Get URLs that were filtered out\n    const newUrls = $('Remove NewsData.io Duplicates').all().map(i => i.json.link);\n    const existingUrls = existing.map(i => i.json.article_url || i.json.fields?.article_url);\n    const finalUrls = filtered.map(i => i.json.link);\n    \n    return newUrls.filter(url => \n      existingUrls.includes(url) && !finalUrls.includes(url)\n    ).slice(0, 10); // Limit to 10 examples\n  } catch {\n    return [];\n  }\n}\n\nfunction collectErrors() {\n  const errors = [];\n  \n  // Check each source node for errors\n  const sourceNodes = [\n    'Newsdata.io API',\n    'Maritime Executive RSS', \n    'theloadstar RSS',\n    'Transform ICC Data',\n    'GAC formatting code'\n  ];\n  \n  sourceNodes.forEach(nodeName => {\n    try {\n      const node = $(nodeName);\n      if (!node.all() || node.all().length === 0) {\n        errors.push({\n          node: nodeName,\n          error: 'No data returned (possible failure or empty result)'\n        });\n      }\n    } catch (e) {\n      errors.push({\n        node: nodeName,\n        error: e.message\n      });\n    }\n  });\n  \n  return errors;\n}\n\nreturn [{ json: debugData }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2368,
+        464
+      ],
+      "id": "211dbfab-4b43-465a-bd17-f95b05e8b137",
+      "name": "Collect Debug Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "const debug = $('Collect Debug Data').first().json;\n\nconst html = `\n<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"utf-8\">\n  <title>Maritime Monitor - Debug Report</title>\n  <style>\n    body { \n      font-family: 'Courier New', monospace; \n      background: #1e1e1e; \n      color: #e0e0e0; \n      padding: 20px; \n      margin: 0;\n    }\n    .container { \n      max-width: 900px; \n      margin: 0 auto; \n      background: #252526; \n      padding: 20px; \n      border-radius: 8px; \n    }\n    h1 { \n      color: #4EC9B0; \n      border-bottom: 2px solid #4EC9B0; \n      padding-bottom: 10px; \n      margin-top: 0;\n    }\n    h2 { \n      color: #DCDCAA; \n      margin-top: 30px; \n    }\n    .success { color: #4EC9B0; font-weight: bold; }\n    .error { color: #F48771; font-weight: bold; }\n    .warning { color: #CE9178; font-weight: bold; }\n    .stat { \n      background: #2D2D30; \n      padding: 12px; \n      margin: 8px 0; \n      border-radius: 4px; \n      color: #e0e0e0;\n    }\n    .stat-label { \n      color: #9CDCFE; \n      font-weight: bold; \n    }\n    table { \n      width: 100%; \n      border-collapse: collapse; \n      margin: 10px 0; \n    }\n    th { \n      background: #2D2D30; \n      padding: 10px; \n      text-align: left; \n      color: #569CD6; \n      font-weight: bold;\n    }\n    td { \n      padding: 10px; \n      border-bottom: 1px solid #3E3E42; \n      color: #e0e0e0;\n    }\n    .code { \n      background: #1e1e1e; \n      padding: 15px; \n      border-radius: 4px; \n      overflow-x: auto; \n      color: #e0e0e0;\n      border: 1px solid #3E3E42;\n    }\n    .code-item {\n      margin-bottom: 15px;\n      padding-bottom: 15px;\n      border-bottom: 1px solid #3E3E42;\n    }\n    .code-item:last-child {\n      border-bottom: none;\n    }\n    .code-title {\n      color: #DCDCAA;\n      font-weight: bold;\n      margin-bottom: 5px;\n    }\n    .code-source {\n      color: #9CDCFE;\n      font-size: 12px;\n    }\n    .code-url {\n      color: #4EC9B0;\n      font-size: 11px;\n      word-break: break-all;\n    }\n    .timestamp { \n      color: #858585; \n      font-size: 12px; \n    }\n    hr {\n      border: none;\n      border-top: 1px solid #3E3E42;\n      margin: 30px 0;\n    }\n    a {\n      color: #4EC9B0;\n      text-decoration: none;\n    }\n    a:hover {\n      text-decoration: underline;\n    }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <h1>🐛 Maritime Supply Chain Monitor - Debug Report</h1>\n    <p class=\"timestamp\">Execution: ${debug.execution.date}</p>\n    \n    <h2>📊 Source Performance</h2>\n    <table>\n      <tr>\n        <th>Source</th>\n        <th>Status</th>\n        <th>Articles Found</th>\n        <th>Error</th>\n      </tr>\n      ${Object.entries(debug.sources).map(([name, stats]) => `\n        <tr>\n          <td>${formatSourceName(name)}</td>\n          <td class=\"${stats.status === 'success' ? 'success' : 'error'}\">${stats.status.toUpperCase()}</td>\n          <td>${stats.articlesFound}</td>\n          <td class=\"${stats.error ? 'error' : ''}\">${stats.error || '—'}</td>\n        </tr>\n      `).join('')}\n    </table>\n    \n    <h2>🔄 Deduplication Pipeline</h2>\n    <div class=\"stat\">\n      <span class=\"stat-label\">Total Collected:</span> ${debug.deduplication.totalCollected} articles\n    </div>\n    <div class=\"stat\">\n      <span class=\"stat-label\">NewsData.io Internal Dupes:</span> \n      <span class=\"warning\">-${debug.deduplication.newsdataInternalDupes}</span> removed\n    </div>\n    <div class=\"stat\">\n      <span class=\"stat-label\">URL Duplicates (Already in DB):</span> \n      <span class=\"warning\">-${debug.deduplication.urlDuplicates}</span> filtered\n    </div>\n    <div class=\"stat\">\n      <span class=\"stat-label\">Final Processed:</span> \n      <span class=\"success\">${debug.deduplication.finalProcessed}</span> sent to LLM\n    </div>\n    \n    <h2>🎯 Classification Breakdown</h2>\n    <div class=\"stat\">\n      <span class=\"stat-label\">🔴 RED (Critical):</span> ${debug.classification.red}\n    </div>\n    <div class=\"stat\">\n      <span class=\"stat-label\">🟡 YELLOW (Monitor):</span> ${debug.classification.yellow}\n    </div>\n    <div class=\"stat\">\n      <span class=\"stat-label\">🟢 GREEN (Resolved):</span> ${debug.classification.green}\n    </div>\n    <div class=\"stat\">\n      <span class=\"stat-label\">⚪ SKIP (Discarded):</span> \n      <span class=\"warning\">${debug.classification.skip}</span>\n    </div>\n    \n    ${debug.classification.skip > 0 ? `\n      <h2>🗑️ Discarded Articles (SKIP)</h2>\n      <div class=\"code\">\n        ${debug.discarded.skippedArticles.slice(0, 10).map(article => `\n          <div class=\"code-item\">\n            <div class=\"code-title\">${article.title}</div>\n            <div class=\"code-source\">Source: ${article.source}</div>\n            <div class=\"code-url\"><a href=\"${article.url}\">${article.url}</a></div>\n          </div>\n        `).join('')}\n        ${debug.classification.skip > 10 ? `<p class=\"timestamp\">...and ${debug.classification.skip - 10} more discarded</p>` : ''}\n      </div>\n    ` : '<p style=\"color: #9CDCFE;\">✅ No articles were discarded as SKIP</p>'}\n    \n    ${debug.discarded.duplicateUrls.length > 0 ? `\n      <h2>🔗 Duplicate URLs (Examples)</h2>\n      <div class=\"code\">\n        ${debug.discarded.duplicateUrls.map(url => \n          `<div style=\"margin: 8px 0; color: #9CDCFE;\">${url}</div>`\n        ).join('')}\n      </div>\n    ` : ''}\n    \n    ${debug.errors.length > 0 ? `\n      <h2>❌ Errors Detected</h2>\n      ${debug.errors.map(err => `\n        <div class=\"stat\" style=\"border-left: 3px solid #F48771;\">\n          <div class=\"error\">${err.node}</div>\n          <div style=\"color: #e0e0e0; margin-top: 5px;\">${err.error}</div>\n        </div>\n      `).join('')}\n    ` : '<h2 class=\"success\">✅ No Errors Detected</h2>'}\n    \n    <h2>⚡ Performance Metrics</h2>\n    <div class=\"stat\">\n      <span class=\"stat-label\">Articles Stored:</span> ${debug.performance.articlesProcessed}\n    </div>\n    <div class=\"stat\">\n      <span class=\"stat-label\">LLM API Calls:</span> ~${debug.performance.llmCallsEstimate} (batches of 20)\n    </div>\n    <div class=\"stat\">\n      <span class=\"stat-label\">Emails Sent:</span> ${debug.performance.emailsSent}\n    </div>\n    \n    <hr>\n    <p class=\"timestamp\">\n      This is an automated debug report. To disable, uncheck 'debug_mode' in Airtable Users table.\n    </p>\n  </div>\n</body>\n</html>\n`;\n\nfunction formatSourceName(key) {\n  const names = {\n    newsdata: 'NewsData.io API',\n    maritimeExecutive: 'Maritime Executive RSS',\n    loadstar: 'The Loadstar RSS',\n    iccPiracy: 'ICC Piracy Reports',\n    gacHotPorts: 'GAC Hot Port News'\n  };\n  return names[key] || key;\n}\n\nreturn [{ json: { debugHtml: html } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2576,
+        464
+      ],
+      "id": "5c20a187-7aa0-4f5e-8e9f-d7bf0169a0f9",
+      "name": "Build Debug Email"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "app5Zqgaj1Cn89Lhq",
+          "mode": "list",
+          "cachedResultName": "N8N",
+          "cachedResultUrl": "https://airtable.com/app5Zqgaj1Cn89Lhq"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl9kV2XfJVaeEK0L",
+          "mode": "list",
+          "cachedResultName": "Users",
+          "cachedResultUrl": "https://airtable.com/app5Zqgaj1Cn89Lhq/tbl9kV2XfJVaeEK0L"
+        },
+        "filterByFormula": "{debug_mode} = TRUE()",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        2784,
+        464
+      ],
+      "id": "60561391-6fab-4aa5-b75b-9df6be462ced",
+      "name": "Get Debug Users",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "OdFzjgBZzBVyvHqH",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const debugHtml = $('Build Debug Email').first().json.debugHtml;\nconst users = $('Get Debug Users').all();\n\nreturn users.map(user => ({\n  json: {\n    userEmail: user.json.email || user.json.fields?.email,\n    subject: `🐛 [DEBUG] Maritime Monitor - ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`,\n    debugHtml: debugHtml\n  }\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2992,
+        464
+      ],
+      "id": "1b6b6493-1094-4a4e-9379-470c6027c50b",
+      "name": "Prepare Debug email"
+    },
+    {
+      "parameters": {
+        "fromEmail": "laurynas.ba@gmail.com",
+        "toEmail": "={{ $json.userEmail }}",
+        "subject": "={{ $json.subject }}",
+        "html": "={{ $json.debugHtml }}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        3200,
+        464
+      ],
+      "id": "7862ee76-87b0-4bd8-88b6-f350a7e49614",
+      "name": "Send Debug Email",
+      "webhookId": "996c20e4-7937-4c1c-9b45-9d35dcd330de",
+      "credentials": {
+        "smtp": {
+          "id": "T0EfasUuq25D1GFZ",
+          "name": "SMTP account"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -1276,7 +1374,7 @@
       "main": [
         [
           {
-            "node": "Search records",
+            "node": "Collect Debug Data",
             "type": "main",
             "index": 0
           }
@@ -1304,13 +1402,68 @@
           }
         ]
       ]
+    },
+    "Collect Debug Data": {
+      "main": [
+        [
+          {
+            "node": "Build Debug Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Debug Email": {
+      "main": [
+        [
+          {
+            "node": "Get Debug Users",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Debug Users": {
+      "main": [
+        [
+          {
+            "node": "Prepare Debug email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Debug email": {
+      "main": [
+        [
+          {
+            "node": "Send Debug Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Debug Email": {
+      "main": [
+        [
+          {
+            "node": "Search records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "5ad30e26-38e8-4c12-92e9-f7da40a88751",
+  "versionId": "80b42b93-4ad0-4813-bae1-c69f9063e8c6",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "e0d87344a32d40761403336fd9445d9961e336f26be69e02d2b281abaf9c7e0e"
