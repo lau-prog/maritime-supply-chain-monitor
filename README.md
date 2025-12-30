@@ -2,6 +2,8 @@
 
 Automated n8n workflow that monitors maritime disruptions and emails daily intelligence reports.
 
+![Email Output Example](./assets/email-screenshot.png)
+
 ## What It Does
 
 - Aggregates maritime news from specialized industry sources
@@ -22,7 +24,7 @@ Automated n8n workflow that monitors maritime disruptions and emails daily intel
 1. **Import workflow** into n8n
 2. **Create Airtable base** with tables: `Articles` and `Users`
 3. **Add credentials** in n8n:
-   - Airtable token
+   - Airtable token (with read/write/delete permissions)
    - OpenRouter API key
    - SMTP (for email)
 4. **Replace placeholders** in workflow nodes
@@ -32,7 +34,7 @@ Automated n8n workflow that monitors maritime disruptions and emails daily intel
 
 - n8n (self-hosted or cloud)
 - Airtable account (free tier works)
-- OpenRouter API key (free tier: 10 calls/day)
+- OpenRouter API key (free tier: 50 requests/day)
 
 ## License
 
