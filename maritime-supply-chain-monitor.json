@@ -682,13 +682,11 @@
     {
       "parameters": {
         "url": "https://newsdata.io/api/1/news",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
-            {
-              "name": "apikey",
-              "value": "pub_bf3554fc8e7c4708920543499faf4d0e"
-            },
             {
               "name": "qInTitle",
               "value": "=(port OR shipping OR freight OR terminal) AND (closure OR blockage OR delay)"
@@ -715,6 +713,16 @@
       ],
       "id": "2d4af89e-9b92-43b7-bf8a-1a99b8ceb73c",
       "name": "Newsdata.io API",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "lDz8APNP6irrOKGH",
+          "name": "NewsData.io API Key"
+        },
+        "httpQueryAuth": {
+          "id": "hLpWU9rbN0UYVwV4",
+          "name": "Query Auth account"
+        }
+      },
       "onError": "continueRegularOutput"
     },
     {
@@ -1302,7 +1310,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "5df0f8d2-b609-4d6a-a6cb-8addd32271ae",
+  "versionId": "5ad30e26-38e8-4c12-92e9-f7da40a88751",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "e0d87344a32d40761403336fd9445d9961e336f26be69e02d2b281abaf9c7e0e"
