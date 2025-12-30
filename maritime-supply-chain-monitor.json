@@ -15,7 +15,7 @@
       "typeVersion": 1.3,
       "position": [
         -2672,
-        240
+        464
       ],
       "id": "a2d99208-0275-440a-95e4-90d6f8113560",
       "name": "Schedule Trigger"
@@ -47,8 +47,8 @@
       "type": "n8n-nodes-base.filter",
       "typeVersion": 2.2,
       "position": [
-        -1232,
-        128
+        -1328,
+        464
       ],
       "id": "38998c95-bb0e-4ed6-80c8-93bc59fff1e0",
       "name": "Remove NewsData.io Duplicates"
@@ -58,32 +58,32 @@
         "operation": "search",
         "base": {
           "__rl": true,
-          "value": "YOUR_AIRTABLE_BASE_ID",
+          "value": "app5Zqgaj1Cn89Lhq",
           "mode": "list",
           "cachedResultName": "N8N",
-          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID"
+          "cachedResultUrl": "https://airtable.com/app5Zqgaj1Cn89Lhq"
         },
         "table": {
           "__rl": true,
-          "value": "YOUR_ARTICLES_TABLE_ID",
+          "value": "tblnwUU1uYwBCqobQ",
           "mode": "list",
           "cachedResultName": "Articles",
-          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID/YOUR_ARTICLES_TABLE_ID"
+          "cachedResultUrl": "https://airtable.com/app5Zqgaj1Cn89Lhq/tblnwUU1uYwBCqobQ"
         },
         "options": {}
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
       "position": [
-        -1040,
-        256
+        -1104,
+        544
       ],
       "id": "21ac5759-a85a-4f34-bf7c-80f2b7025824",
       "name": "Get Existing Articles",
       "executeOnce": true,
       "credentials": {
         "airtableTokenApi": {
-          "id": "YOUR_AIRTABLE_CREDENTIAL_ID",
+          "id": "OdFzjgBZzBVyvHqH",
           "name": "Airtable Personal Access Token account"
         }
       }
@@ -93,8 +93,8 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
       "position": [
-        -832,
-        96
+        -880,
+        464
       ],
       "id": "15e54fa7-2849-4658-976c-815855d9920e",
       "name": "Combine New and Existing",
@@ -107,8 +107,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -624,
-        96
+        -656,
+        464
       ],
       "id": "6835c6ec-4d23-4d45-9206-4d8c4989a6df",
       "name": "Filter URL Duplicates"
@@ -120,8 +120,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -320,
-        112
+        -432,
+        464
       ],
       "id": "acd9ed22-f3d8-4dde-9215-780ff60b8251",
       "name": "Build Classification Prompt"
@@ -138,8 +138,8 @@
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
       "typeVersion": 1.7,
       "position": [
-        -48,
-        112
+        -208,
+        464
       ],
       "id": "99d7716c-aa9a-451d-9dd7-8139bffb9824",
       "name": "Basic LLM Chain"
@@ -152,14 +152,14 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
       "typeVersion": 1,
       "position": [
-        -48,
-        304
+        -144,
+        688
       ],
       "id": "8feaca83-4edb-41ab-9b87-9d831f6ecdc4",
       "name": "OpenRouter Chat Model",
       "credentials": {
         "openRouterApi": {
-          "id": "YOUR_OPENROUTER_CREDENTIAL_ID",
+          "id": "JCNP6nJrMlrSKlWa",
           "name": "OpenRouter account"
         }
       }
@@ -171,8 +171,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        576,
-        112
+        368,
+        464
       ],
       "id": "05b625b3-ac23-4c0a-ba82-13d65bad8734",
       "name": "Attach Classifications"
@@ -182,17 +182,17 @@
         "operation": "create",
         "base": {
           "__rl": true,
-          "value": "YOUR_AIRTABLE_BASE_ID",
+          "value": "app5Zqgaj1Cn89Lhq",
           "mode": "list",
           "cachedResultName": "N8N",
-          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID"
+          "cachedResultUrl": "https://airtable.com/app5Zqgaj1Cn89Lhq"
         },
         "table": {
           "__rl": true,
-          "value": "YOUR_ARTICLES_TABLE_ID",
+          "value": "tblnwUU1uYwBCqobQ",
           "mode": "list",
           "cachedResultName": "Articles",
-          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID/YOUR_ARTICLES_TABLE_ID"
+          "cachedResultUrl": "https://airtable.com/app5Zqgaj1Cn89Lhq/tblnwUU1uYwBCqobQ"
         },
         "columns": {
           "mappingMode": "defineBelow",
@@ -332,14 +332,14 @@
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
       "position": [
-        800,
-        112
+        592,
+        464
       ],
       "id": "c2a77e7f-5791-4007-b6d3-425926671313",
       "name": "Store Classified Articles",
       "credentials": {
         "airtableTokenApi": {
-          "id": "YOUR_AIRTABLE_CREDENTIAL_ID",
+          "id": "OdFzjgBZzBVyvHqH",
           "name": "Airtable Personal Access Token account"
         }
       }
@@ -349,52 +349,52 @@
         "operation": "search",
         "base": {
           "__rl": true,
-          "value": "YOUR_AIRTABLE_BASE_ID",
+          "value": "app5Zqgaj1Cn89Lhq",
           "mode": "list",
           "cachedResultName": "N8N",
-          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID"
+          "cachedResultUrl": "https://airtable.com/app5Zqgaj1Cn89Lhq"
         },
         "table": {
           "__rl": true,
-          "value": "YOUR_USERS_TABLE_ID",
+          "value": "tbl9kV2XfJVaeEK0L",
           "mode": "list",
           "cachedResultName": "Users",
-          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID/YOUR_USERS_TABLE_ID"
+          "cachedResultUrl": "https://airtable.com/app5Zqgaj1Cn89Lhq/tbl9kV2XfJVaeEK0L"
         },
         "options": {}
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
       "position": [
-        1056,
-        112
+        816,
+        464
       ],
       "id": "e7508f59-c603-43b9-8cd3-2ab262a15b59",
       "name": "Get Active Users",
       "executeOnce": true,
       "credentials": {
         "airtableTokenApi": {
-          "id": "YOUR_AIRTABLE_CREDENTIAL_ID",
+          "id": "OdFzjgBZzBVyvHqH",
           "name": "Airtable Personal Access Token account"
         }
       }
     },
     {
       "parameters": {
-        "jsCode": "// Get unsent articles from Airtable\nconst articles = $('Get Unsent Articles').all();\n\n// Group by classification - handle Airtable structure\nconst redArticles = articles.filter(item => {\n  const classification = item.json.fields?.classification || item.json.classification;\n  return classification === 'RED';\n});\n\nconst yellowArticles = articles.filter(item => {\n  const classification = item.json.fields?.classification || item.json.classification;\n  return classification === 'YELLOW';\n});\n\nconst greenArticles = articles.filter(item => {\n  const classification = item.json.fields?.classification || item.json.classification;\n  return classification === 'GREEN';\n});\n\n// Helper function to generate one article item\nfunction generateArticleItem(item, colorCode, labelText) {\n  const fields = item.json.fields || item.json;\n  const title = fields.title || '';\n  const url = fields.article_url || '#';\n  const source = fields.source || '';\n  const date = fields.published_date || '';\n  const summary = (fields.summary || '').substring(0, 140) + '...';\n\n  return `\n          <tr>\n            <td style=\"padding:0 16px 8px 16px;\">\n              <table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\">\n                <tr>\n                  <td width=\"3\" bgcolor=\"${colorCode}\"></td>\n                  <td style=\"padding:8px 10px;border:1px solid #eeeeee;border-left:none;\">\n                    \n                    <table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\">\n                      <tr>\n                        <td style=\"font-family:Arial,sans-serif;font-size:11px;color:${colorCode};font-weight:bold;text-transform:uppercase;\">${labelText}</td>\n                        <td align=\"right\" style=\"font-family:Arial,sans-serif;font-size:11px;color:#888888;\">${source}${source && date ? ' \u2022 ' : ''}${date}</td>\n                      </tr>\n                    </table>\n\n                    <p style=\"margin:4px 0;font-family:Arial,sans-serif;font-size:13px;font-weight:bold;color:#111111;\">\n                      <a href=\"${url}\" style=\"color:#111111;text-decoration:none;\">${title}</a>\n                    </p>\n\n                    <p style=\"margin:0;font-family:Arial,sans-serif;font-size:12px;line-height:16px;color:#555555;\">\n                      ${summary}\n                      <a href=\"${url}\" style=\"color:#1565C0;text-decoration:none;font-size:11px;\">&nbsp;\u203a</a>\n                    </p>\n\n                  </td>\n                </tr>\n              </table>\n            </td>\n          </tr>\n  `;\n}\n\n// Build HTML email\nlet html = `\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Maritime Supply Chain Monitor</title>\n  <meta name=\"viewport\" content=\"width=device-width,initial-scale=1.0\">\n  <style>\n    body {margin:0;padding:0;background:#ffffff;}\n    table {border-collapse:collapse;border-spacing:0;}\n    @media only screen and (max-width:600px){\n      .container{width:100%!important;}\n    }\n  </style>\n</head>\n<body style=\"margin:0;padding:0;background:#ffffff;\">\n  \n  <table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\">\n    <tr>\n      <td align=\"center\" style=\"padding:20px 0;\">\n        \n        <table role=\"presentation\" class=\"container\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\" style=\"width:100%;max-width:640px;background:#ffffff;\">\n          \n          <tr>\n            <td style=\"padding:16px;\">\n              <h1 style=\"margin:0;font-family:Arial,sans-serif;font-size:18px;font-weight:bold;color:#111111;\">Maritime Supply Chain Monitor</h1>\n              <p style=\"margin:4px 0 0 0;font-family:Arial,sans-serif;font-size:11px;color:#888888;\">Daily digest \u2022 ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</p>\n              <p style=\"margin:4px 0 0 0;font-family:Arial,sans-serif;font-size:11px;color:#555555;\">RED: ${redArticles.length} \u2022 YELLOW: ${yellowArticles.length} \u2022 GREEN: ${greenArticles.length}</p>\n            </td>\n          </tr>\n`;\n\n// RED SECTION\nif (redArticles.length > 0) {\n  html += `\n          <tr>\n            <td style=\"padding:4px 16px;\">\n              <p style=\"margin:0;font-family:Arial,sans-serif;font-size:12px;font-weight:bold;color:#D32F2F;\">\ud83d\udd34 Critical disruptions</p>\n            </td>\n          </tr>\n  `;\n  \n  redArticles.forEach(item => {\n    html += generateArticleItem(item, '#D32F2F', 'RED');\n  });\n}\n\n// YELLOW SECTION\nif (yellowArticles.length > 0) {\n  html += `\n          <tr>\n            <td style=\"padding:4px 16px;\">\n              <p style=\"margin:0;font-family:Arial,sans-serif;font-size:12px;font-weight:bold;color:#F57C00;\">\ud83d\udfe1 Monitor</p>\n            </td>\n          </tr>\n  `;\n  \n  yellowArticles.forEach(item => {\n    html += generateArticleItem(item, '#F57C00', 'YELLOW');\n  });\n}\n\n// GREEN SECTION\nif (greenArticles.length > 0) {\n  html += `\n          <tr>\n            <td style=\"padding:4px 16px;\">\n              <p style=\"margin:0;font-family:Arial,sans-serif;font-size:12px;font-weight:bold;color:#2E7D32;\">\ud83d\udfe2 Resolved</p>\n            </td>\n          </tr>\n  `;\n  \n  greenArticles.forEach(item => {\n    html += generateArticleItem(item, '#2E7D32', 'GREEN');\n  });\n}\n\n// NO ARTICLES (all clear)\nif (redArticles.length === 0 && yellowArticles.length === 0 && greenArticles.length === 0) {\n  html += `\n          <tr>\n            <td style=\"padding:20px 16px;\">\n              <p style=\"margin:0;font-family:Arial,sans-serif;font-size:14px;color:#2E7D32;text-align:center;\">\u2705 No significant supply chain disruptions today!</p>\n            </td>\n          </tr>\n  `;\n}\n\n// FOOTER\nhtml += `\n          <tr>\n            <td style=\"padding:16px;border-top:1px solid #eeeeee;\">\n              <table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\">\n                <tr>\n                  <td style=\"font-family:Arial,sans-serif;font-size:11px;color:#999999;\">Automated report from Supply Chain Monitor</td>\n                  <td align=\"right\" style=\"font-family:Arial,sans-serif;font-size:11px;\">\n                    <a href=\"#\" style=\"color:#999999;text-decoration:underline;\">Manage alerts</a>\n                  </td>\n                </tr>\n              </table>\n            </td>\n          </tr>\n\n        </table>\n\n      </td>\n    </tr>\n  </table>\n\n</body>\n</html>\n`;\n\nreturn [{\n  json: {\n    emailHtml: html,\n    articleCount: articles.length,\n    redCount: redArticles.length,\n    yellowCount: yellowArticles.length,\n    greenCount: greenArticles.length\n  }\n}];\n"
+        "jsCode": "// Get unsent articles from Airtable\nconst articles = $('Get Unsent Articles').all();\n\n// Group by classification - handle Airtable structure\nconst redArticles = articles.filter(item => {\n  const classification = item.json.fields?.classification || item.json.classification;\n  return classification === 'RED';\n});\n\nconst yellowArticles = articles.filter(item => {\n  const classification = item.json.fields?.classification || item.json.classification;\n  return classification === 'YELLOW';\n});\n\nconst greenArticles = articles.filter(item => {\n  const classification = item.json.fields?.classification || item.json.classification;\n  return classification === 'GREEN';\n});\n\n// Helper function to generate one article item\nfunction generateArticleItem(item, colorCode, labelText) {\n  const fields = item.json.fields || item.json;\n  const title = fields.title || '';\n  const url = fields.article_url || '#';\n  const source = fields.source || '';\n  const date = fields.published_date || '';\n  const summary = (fields.summary || '').substring(0, 140) + '...';\n\n  return `\n          <tr>\n            <td style=\"padding:0 16px 8px 16px;\">\n              <table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\">\n                <tr>\n                  <td width=\"3\" bgcolor=\"${colorCode}\"></td>\n                  <td style=\"padding:8px 10px;border:1px solid #eeeeee;border-left:none;\">\n                    \n                    <table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\">\n                      <tr>\n                        <td style=\"font-family:Arial,sans-serif;font-size:11px;color:${colorCode};font-weight:bold;text-transform:uppercase;\">${labelText}</td>\n                        <td align=\"right\" style=\"font-family:Arial,sans-serif;font-size:11px;color:#888888;\">${source}${source && date ? ' • ' : ''}${date}</td>\n                      </tr>\n                    </table>\n\n                    <p style=\"margin:4px 0;font-family:Arial,sans-serif;font-size:13px;font-weight:bold;color:#111111;\">\n                      <a href=\"${url}\" style=\"color:#111111;text-decoration:none;\">${title}</a>\n                    </p>\n\n                    <p style=\"margin:0;font-family:Arial,sans-serif;font-size:12px;line-height:16px;color:#555555;\">\n                      ${summary}\n                      <a href=\"${url}\" style=\"color:#1565C0;text-decoration:none;font-size:11px;\">&nbsp;›</a>\n                    </p>\n\n                  </td>\n                </tr>\n              </table>\n            </td>\n          </tr>\n  `;\n}\n\n// Build HTML email\nlet html = `\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Maritime Supply Chain Monitor</title>\n  <meta name=\"viewport\" content=\"width=device-width,initial-scale=1.0\">\n  <style>\n    body {margin:0;padding:0;background:#ffffff;}\n    table {border-collapse:collapse;border-spacing:0;}\n    @media only screen and (max-width:600px){\n      .container{width:100%!important;}\n    }\n  </style>\n</head>\n<body style=\"margin:0;padding:0;background:#ffffff;\">\n  \n  <table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\">\n    <tr>\n      <td align=\"center\" style=\"padding:20px 0;\">\n        \n        <table role=\"presentation\" class=\"container\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\" style=\"width:100%;max-width:640px;background:#ffffff;\">\n          \n          <tr>\n            <td style=\"padding:16px;\">\n              <h1 style=\"margin:0;font-family:Arial,sans-serif;font-size:18px;font-weight:bold;color:#111111;\">Maritime Supply Chain Monitor</h1>\n              <p style=\"margin:4px 0 0 0;font-family:Arial,sans-serif;font-size:11px;color:#888888;\">Daily digest • ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</p>\n              <p style=\"margin:4px 0 0 0;font-family:Arial,sans-serif;font-size:11px;color:#555555;\">RED: ${redArticles.length} • YELLOW: ${yellowArticles.length} • GREEN: ${greenArticles.length}</p>\n            </td>\n          </tr>\n`;\n\n// RED SECTION\nif (redArticles.length > 0) {\n  html += `\n          <tr>\n            <td style=\"padding:4px 16px;\">\n              <p style=\"margin:0;font-family:Arial,sans-serif;font-size:12px;font-weight:bold;color:#D32F2F;\">🔴 Critical disruptions</p>\n            </td>\n          </tr>\n  `;\n  \n  redArticles.forEach(item => {\n    html += generateArticleItem(item, '#D32F2F', 'RED');\n  });\n}\n\n// YELLOW SECTION\nif (yellowArticles.length > 0) {\n  html += `\n          <tr>\n            <td style=\"padding:4px 16px;\">\n              <p style=\"margin:0;font-family:Arial,sans-serif;font-size:12px;font-weight:bold;color:#F57C00;\">🟡 Monitor</p>\n            </td>\n          </tr>\n  `;\n  \n  yellowArticles.forEach(item => {\n    html += generateArticleItem(item, '#F57C00', 'YELLOW');\n  });\n}\n\n// GREEN SECTION\nif (greenArticles.length > 0) {\n  html += `\n          <tr>\n            <td style=\"padding:4px 16px;\">\n              <p style=\"margin:0;font-family:Arial,sans-serif;font-size:12px;font-weight:bold;color:#2E7D32;\">🟢 Resolved</p>\n            </td>\n          </tr>\n  `;\n  \n  greenArticles.forEach(item => {\n    html += generateArticleItem(item, '#2E7D32', 'GREEN');\n  });\n}\n\n// NO ARTICLES (all clear)\nif (redArticles.length === 0 && yellowArticles.length === 0 && greenArticles.length === 0) {\n  html += `\n          <tr>\n            <td style=\"padding:20px 16px;\">\n              <p style=\"margin:0;font-family:Arial,sans-serif;font-size:14px;color:#2E7D32;text-align:center;\">✅ No significant supply chain disruptions today!</p>\n            </td>\n          </tr>\n  `;\n}\n\n// FOOTER\nhtml += `\n          <tr>\n            <td style=\"padding:16px;border-top:1px solid #eeeeee;\">\n              <table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\">\n                <tr>\n                  <td style=\"font-family:Arial,sans-serif;font-size:11px;color:#999999;\">Automated report from Supply Chain Monitor</td>\n                  <td align=\"right\" style=\"font-family:Arial,sans-serif;font-size:11px;\">\n                    <a href=\"#\" style=\"color:#999999;text-decoration:underline;\">Manage alerts</a>\n                  </td>\n                </tr>\n              </table>\n            </td>\n          </tr>\n\n        </table>\n\n      </td>\n    </tr>\n  </table>\n\n</body>\n</html>\n`;\n\nreturn [{\n  json: {\n    emailHtml: html,\n    articleCount: articles.length,\n    redCount: redArticles.length,\n    yellowCount: yellowArticles.length,\n    greenCount: greenArticles.length\n  }\n}];\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1520,
-        128
+        1264,
+        464
       ],
       "id": "19d6eb71-27f3-4cbe-868b-63794919b3dd",
       "name": "Build Email HTML"
     },
     {
       "parameters": {
-        "fromEmail": "your-email@gmail.com",
+        "fromEmail": "laurynas.ba@gmail.com",
         "toEmail": "={{ $json.userEmail }}",
         "subject": "={{ $json.subject }}",
         "html": "={{ $json.emailHtml }}",
@@ -403,15 +403,15 @@
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
       "position": [
-        1936,
-        160
+        1712,
+        464
       ],
       "id": "d706bd91-3b65-4103-8bbd-5b184c32f191",
       "name": "Send email",
       "webhookId": "7b7def9e-f7ee-4824-9a2a-9d55fa3970f1",
       "credentials": {
         "smtp": {
-          "id": "YOUR_SMTP_CREDENTIAL_ID",
+          "id": "T0EfasUuq25D1GFZ",
           "name": "SMTP account"
         }
       }
@@ -421,17 +421,17 @@
         "operation": "search",
         "base": {
           "__rl": true,
-          "value": "YOUR_AIRTABLE_BASE_ID",
+          "value": "app5Zqgaj1Cn89Lhq",
           "mode": "list",
           "cachedResultName": "N8N",
-          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID"
+          "cachedResultUrl": "https://airtable.com/app5Zqgaj1Cn89Lhq"
         },
         "table": {
           "__rl": true,
-          "value": "YOUR_ARTICLES_TABLE_ID",
+          "value": "tblnwUU1uYwBCqobQ",
           "mode": "list",
           "cachedResultName": "Articles",
-          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID/YOUR_ARTICLES_TABLE_ID"
+          "cachedResultUrl": "https://airtable.com/app5Zqgaj1Cn89Lhq/tblnwUU1uYwBCqobQ"
         },
         "filterByFormula": "{sent_in_email} = FALSE()",
         "options": {}
@@ -439,28 +439,28 @@
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
       "position": [
-        1312,
-        112
+        1040,
+        464
       ],
       "id": "f3375d62-43f0-476f-84aa-b46799220da8",
       "name": "Get Unsent Articles",
       "executeOnce": true,
       "credentials": {
         "airtableTokenApi": {
-          "id": "YOUR_AIRTABLE_CREDENTIAL_ID",
+          "id": "OdFzjgBZzBVyvHqH",
           "name": "Airtable Personal Access Token account"
         }
       }
     },
     {
       "parameters": {
-        "jsCode": "// Get the email HTML (1 item from Build Email HTML)\nconst emailData = $('Build Email HTML').first().json;\n\n// Get all active users\nconst users = $('Get Active Users').all();\n\n// Create one item per user with both email HTML and user email\nreturn users.map(user => ({\n  json: {\n    userEmail: user.json.email,\n    emailHtml: emailData.emailHtml,\n    subject:`\u2693 Maritime Supply Chain Monitor - ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`\n  }\n}));\n"
+        "jsCode": "// Get the email HTML (1 item from Build Email HTML)\nconst emailData = $('Build Email HTML').first().json;\n\n// Get all active users\nconst users = $('Get Active Users').all();\n\n// Create one item per user with both email HTML and user email\nreturn users.map(user => ({\n  json: {\n    userEmail: user.json.email,\n    emailHtml: emailData.emailHtml,\n    subject:`⚓ Maritime Supply Chain Monitor - ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`\n  }\n}));\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1712,
-        144
+        1488,
+        464
       ],
       "id": "de162f24-0809-4bdc-945c-0a82d7b92bfe",
       "name": "Prepare Email for Each User",
@@ -473,8 +473,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2192,
-        176
+        1936,
+        464
       ],
       "id": "3a1ec090-bf82-49ab-b00d-5e6152cee865",
       "name": "Prepare Update Data",
@@ -485,17 +485,17 @@
         "operation": "update",
         "base": {
           "__rl": true,
-          "value": "YOUR_AIRTABLE_BASE_ID",
+          "value": "app5Zqgaj1Cn89Lhq",
           "mode": "list",
           "cachedResultName": "N8N",
-          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID"
+          "cachedResultUrl": "https://airtable.com/app5Zqgaj1Cn89Lhq"
         },
         "table": {
           "__rl": true,
-          "value": "YOUR_ARTICLES_TABLE_ID",
+          "value": "tblnwUU1uYwBCqobQ",
           "mode": "list",
           "cachedResultName": "Articles",
-          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID/YOUR_ARTICLES_TABLE_ID"
+          "cachedResultUrl": "https://airtable.com/app5Zqgaj1Cn89Lhq/tblnwUU1uYwBCqobQ"
         },
         "columns": {
           "mappingMode": "defineBelow",
@@ -639,14 +639,14 @@
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
       "position": [
-        2416,
-        176
+        2160,
+        464
       ],
       "id": "29719fdd-b1a1-4441-bed2-8f0445be3c75",
       "name": "Mark Articles as Sent",
       "credentials": {
         "airtableTokenApi": {
-          "id": "YOUR_AIRTABLE_CREDENTIAL_ID",
+          "id": "OdFzjgBZzBVyvHqH",
           "name": "Airtable Personal Access Token account"
         }
       }
@@ -658,8 +658,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1488,
-        448
+        -1552,
+        464
       ],
       "id": "21da57e1-baf9-4897-9d11-aee7edcfc663",
       "name": "Normalize All Formats"
@@ -671,8 +671,8 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
       "position": [
-        -1760,
-        368
+        -1776,
+        416
       ],
       "id": "87faa2df-7d95-4799-9d42-0a679b18a73e",
       "name": "Merge All Sources",
@@ -687,7 +687,7 @@
           "parameters": [
             {
               "name": "apikey",
-              "value": "YOUR_NEWSDATA_API_KEY"
+              "value": "pub_bf3554fc8e7c4708920543499faf4d0e"
             },
             {
               "name": "qInTitle",
@@ -710,7 +710,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -2064,
+        -2000,
         80
       ],
       "id": "2d4af89e-9b92-43b7-bf8a-1a99b8ceb73c",
@@ -725,8 +725,8 @@
       "type": "n8n-nodes-base.rssFeedRead",
       "typeVersion": 1.2,
       "position": [
-        -2064,
-        240
+        -2000,
+        272
       ],
       "id": "8122865d-cccc-47cc-b5cb-292194daf346",
       "name": "Maritime Executive RSS",
@@ -741,8 +741,8 @@
       "type": "n8n-nodes-base.rssFeedRead",
       "typeVersion": 1.2,
       "position": [
-        -2080,
-        528
+        -2000,
+        464
       ],
       "id": "e4f53a4d-eeb6-408d-a6e3-f83779721472",
       "name": "theloadstar RSS",
@@ -764,7 +764,7 @@
       "typeVersion": 4.3,
       "position": [
         -2224,
-        832
+        656
       ],
       "id": "775b51e7-13b0-465d-824f-611b3f1530f3",
       "name": "Get ICC Piracy Incidents",
@@ -779,8 +779,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2016,
-        832
+        -2000,
+        656
       ],
       "id": "84453795-661e-4805-94fd-45df2b40ab62",
       "name": "Transform ICC Data"
@@ -799,8 +799,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -2032,
-        1040
+        -2448,
+        848
       ],
       "id": "a89d8212-5297-4453-904d-4a4d5f3d2e80",
       "name": "HTTP Request"
@@ -824,21 +824,21 @@
       "type": "n8n-nodes-base.html",
       "typeVersion": 1.2,
       "position": [
-        -1824,
-        1040
+        -2224,
+        848
       ],
       "id": "850158b7-8150-4166-bf9f-ebca4b0f5fca",
       "name": "HTML"
     },
     {
       "parameters": {
-        "jsCode": "const input = $input.first().json;\nconst cardsArray = input.cards || [];\n\nconst results = [];\n\ncardsArray.forEach((cardHtml, index) => {\n  try {\n    // Extract date\n    const dateMatch = cardHtml.match(/<p[^>]*>(\\d{1,2}\\s+\\w{3,}\\s+\\d{4})<\\/p>/);\n    if (!dateMatch) {\n      console.log(`Card ${index}: No date - skipping`);\n      return;\n    }\n    const date = dateMatch[1].trim();\n    \n    // Extract location (second <p> tag)\n    const allPTags = cardHtml.match(/<p[^>]*>([^<]+)<\\/p>/g) || [];\n    if (allPTags.length < 2) {\n      console.log(`Card ${index}: Missing location - skipping`);\n      return;\n    }\n    const location = allPTags[1]\n      .replace(/<\\/?p[^>]*>/g, '')\n      .replace(/&amp;/g, '&')\n      .trim();\n    \n    // Skip non-location items (Corporate News, Insights, Feature, GAC VOICES)\n    if (location === 'Feature' || location === 'GAC VOICES' || location.includes('Corporate') || location.includes('Insights')) {\n      console.log(`Card ${index}: Non-location (${location}) - skipping`);\n      return;\n    }\n    \n    // Extract title\n    const titleMatch = cardHtml.match(/<h6[^>]*>([^<]+)<\\/h6>/i);\n    if (!titleMatch) {\n      console.log(`Card ${index}: No title - skipping`);\n      return;\n    }\n    const title = titleMatch[1].trim();\n    \n    // Extract description (text after h6, before Read More)\n    const descMatch = cardHtml.match(/<\\/h6>\\s*([^<]+)/);\n    const description = descMatch \n      ? descMatch[1].trim().replace(/Read More/gi, '').trim()\n      : '';\n    \n    // Generate URL slug from title\n    const slug = title.toLowerCase()\n      .replace(/'/g, '')\n      .replace(/[^a-z0-9\\s-]/g, '')\n      .replace(/\\s+/g, '-')\n      .replace(/-{2,}/g, '-')\n      .substring(0, 80);\n    \n    const articleUrl = `https://www.gac.com/hot-port-news/${slug}`;\n    \n    results.push({\n      json: {\n        title: title,\n        description: description.substring(0, 300),\n        link: articleUrl,\n        pubDate: date,\n        source_id: 'GAC Hot Port News',\n        article_id: `gac-${slug}`,\n        article_url: articleUrl,\n        image_url: null,\n        video_url: null,\n        source_url: 'https://www.gac.com/hot-port-news',\n        source_priority: 1,\n        country: location,\n        category: ['logistics', 'maritime', 'port'],\n        language: 'en',\n        sentiment: null,\n        ai_tag: null,\n        ai_region: null,\n        ai_org: null,\n        duplicate: false,\n        content: description.substring(0, 500)\n      }\n    });\n    \n    console.log(`\u2713 Card ${index}: ${title} (${location})`);\n    \n  } catch (e) {\n    console.log(`\u2717 Card ${index}: Error - ${e.message}`);\n  }\n});\n\nconsole.log(`\\n\u2713 Successfully extracted ${results.length} Hot Port News items`);\n\nif (results.length === 0) {\n  throw new Error('No Hot Port News items found after filtering');\n}\n\nreturn results;\n"
+        "jsCode": "const input = $input.first().json;\nconst cardsArray = input.cards || [];\n\nconst results = [];\n\ncardsArray.forEach((cardHtml, index) => {\n  try {\n    // Extract date\n    const dateMatch = cardHtml.match(/<p[^>]*>(\\d{1,2}\\s+\\w{3,}\\s+\\d{4})<\\/p>/);\n    if (!dateMatch) {\n      console.log(`Card ${index}: No date - skipping`);\n      return;\n    }\n    const date = dateMatch[1].trim();\n    \n    // Extract location (second <p> tag)\n    const allPTags = cardHtml.match(/<p[^>]*>([^<]+)<\\/p>/g) || [];\n    if (allPTags.length < 2) {\n      console.log(`Card ${index}: Missing location - skipping`);\n      return;\n    }\n    const location = allPTags[1]\n      .replace(/<\\/?p[^>]*>/g, '')\n      .replace(/&amp;/g, '&')\n      .trim();\n    \n    // Skip non-location items (Corporate News, Insights, Feature, GAC VOICES)\n    if (location === 'Feature' || location === 'GAC VOICES' || location.includes('Corporate') || location.includes('Insights')) {\n      console.log(`Card ${index}: Non-location (${location}) - skipping`);\n      return;\n    }\n    \n    // Extract title\n    const titleMatch = cardHtml.match(/<h6[^>]*>([^<]+)<\\/h6>/i);\n    if (!titleMatch) {\n      console.log(`Card ${index}: No title - skipping`);\n      return;\n    }\n    const title = titleMatch[1].trim();\n    \n    // Extract description (text after h6, before Read More)\n    const descMatch = cardHtml.match(/<\\/h6>\\s*([^<]+)/);\n    const description = descMatch \n      ? descMatch[1].trim().replace(/Read More/gi, '').trim()\n      : '';\n    \n    // Generate URL slug from title\n    const slug = title.toLowerCase()\n      .replace(/'/g, '')\n      .replace(/[^a-z0-9\\s-]/g, '')\n      .replace(/\\s+/g, '-')\n      .replace(/-{2,}/g, '-')\n      .substring(0, 80);\n    \n    const articleUrl = `https://www.gac.com/hot-port-news/${slug}`;\n    \n    results.push({\n      json: {\n        title: title,\n        description: description.substring(0, 300),\n        link: articleUrl,\n        pubDate: date,\n        source_id: 'GAC Hot Port News',\n        article_id: `gac-${slug}`,\n        article_url: articleUrl,\n        image_url: null,\n        video_url: null,\n        source_url: 'https://www.gac.com/hot-port-news',\n        source_priority: 1,\n        country: location,\n        category: ['logistics', 'maritime', 'port'],\n        language: 'en',\n        sentiment: null,\n        ai_tag: null,\n        ai_region: null,\n        ai_org: null,\n        duplicate: false,\n        content: description.substring(0, 500)\n      }\n    });\n    \n    console.log(`✓ Card ${index}: ${title} (${location})`);\n    \n  } catch (e) {\n    console.log(`✗ Card ${index}: Error - ${e.message}`);\n  }\n});\n\nconsole.log(`\\n✓ Successfully extracted ${results.length} Hot Port News items`);\n\nif (results.length === 0) {\n  throw new Error('No Hot Port News items found after filtering');\n}\n\nreturn results;\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1680,
-        688
+        -2000,
+        848
       ],
       "id": "c73f2c90-d522-4658-b044-f81f11f50c4a",
       "name": "GAC formatting code"
@@ -850,11 +850,94 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        304,
-        112
+        144,
+        464
       ],
       "id": "ef2d9ad1-4407-463f-bbc4-bdef3a8587c0",
       "name": "Filter"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "app5Zqgaj1Cn89Lhq",
+          "mode": "list",
+          "cachedResultName": "N8N",
+          "cachedResultUrl": "https://airtable.com/app5Zqgaj1Cn89Lhq"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblnwUU1uYwBCqobQ",
+          "mode": "list",
+          "cachedResultName": "Articles",
+          "cachedResultUrl": "https://airtable.com/app5Zqgaj1Cn89Lhq/tblnwUU1uYwBCqobQ"
+        },
+        "filterByFormula": "DATETIME_DIFF(NOW(), {first_seen_date}, 'days') >= 5",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        2368,
+        464
+      ],
+      "id": "a234ae7d-e8bf-45c1-8fc3-9de793555705",
+      "name": "Search records",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "OdFzjgBZzBVyvHqH",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get articles older than 5 days\nconst oldArticles = $input.all();\n\n// If no old articles, skip deletion\nif (oldArticles.length === 0) {\n  console.log('No articles older than 5 days to delete');\n  return [];\n}\n\n// Extract Airtable record IDs for deletion\nconst deleteItems = oldArticles.map(article => ({\n  json: {\n    id: article.json.id  // Airtable's internal record ID\n  }\n}));\n\nconsole.log(`Preparing to delete ${deleteItems.length} articles older than 5 days`);\n\nreturn deleteItems;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2576,
+        464
+      ],
+      "id": "f4220b2c-dd60-435c-8f34-14e6e1638e45",
+      "name": "Prepare Delete IDs"
+    },
+    {
+      "parameters": {
+        "operation": "deleteRecord",
+        "base": {
+          "__rl": true,
+          "value": "app5Zqgaj1Cn89Lhq",
+          "mode": "list",
+          "cachedResultName": "N8N",
+          "cachedResultUrl": "https://airtable.com/app5Zqgaj1Cn89Lhq"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblnwUU1uYwBCqobQ",
+          "mode": "list",
+          "cachedResultName": "Articles",
+          "cachedResultUrl": "https://airtable.com/app5Zqgaj1Cn89Lhq/tblnwUU1uYwBCqobQ"
+        },
+        "id": "={{ $json.id }}"
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        2784,
+        464
+      ],
+      "id": "937b9e8c-1279-41ea-850e-1c49486d6d13",
+      "name": "Delete a record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "OdFzjgBZzBVyvHqH",
+          "name": "Airtable Personal Access Token account"
+        }
+      },
+      "onError": "continueRegularOutput"
     }
   ],
   "pinData": {},
@@ -1180,16 +1263,50 @@
           }
         ]
       ]
+    },
+    "Mark Articles as Sent": {
+      "main": [
+        [
+          {
+            "node": "Search records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search records": {
+      "main": [
+        [
+          {
+            "node": "Prepare Delete IDs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Delete IDs": {
+      "main": [
+        [
+          {
+            "node": "Delete a record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
   "settings": {
     "executionOrder": "v1"
   },
+  "versionId": "5df0f8d2-b609-4d6a-a6cb-8addd32271ae",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "YOUR_N8N_INSTANCE_ID"
+    "instanceId": "e0d87344a32d40761403336fd9445d9961e336f26be69e02d2b281abaf9c7e0e"
   },
-  "id": "YOUR_WORKFLOW_ID",
+  "id": "G15SndqL7FkX0UXl",
   "tags": []
 }
